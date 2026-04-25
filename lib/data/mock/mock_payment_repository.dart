@@ -15,4 +15,10 @@ class MockPaymentRepository {
     final sorted = [..._items]..sort((a, b) => b.date.compareTo(a.date));
     return List.unmodifiable(sorted);
   }
+
+  Future<Payment> create(Payment payment) async {
+    await Future.delayed(_latency);
+    _items.add(payment);
+    return payment;
+  }
 }
