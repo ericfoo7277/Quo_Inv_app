@@ -50,6 +50,8 @@ class CustomerDocumentSection extends StatelessWidget {
                     index: entry.key,
                     child: DocumentCard(
                       number: entry.value.invoiceNumber,
+                      customerName: entry.value.customerName,
+                      meta: 'Due ${_date(entry.value.dueDate)}',
                       amount: _currency(
                           context, entry.value.currency, entry.value.total),
                       statusLabel: entry.value.status.label,
@@ -71,6 +73,8 @@ class CustomerDocumentSection extends StatelessWidget {
                     index: entry.key,
                     child: DocumentCard(
                       number: entry.value.quotationNumber,
+                      customerName: entry.value.customerName,
+                      meta: 'Valid until ${_date(entry.value.validUntil)}',
                       amount: _currency(
                           context, entry.value.currency, entry.value.total),
                       statusLabel: entry.value.status.label,
