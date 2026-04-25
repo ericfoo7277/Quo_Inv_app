@@ -47,7 +47,9 @@ class _InvoiceFormScreenState extends ConsumerState<InvoiceFormScreen> {
   DateTime _dueDate = DateTime.now().add(const Duration(days: 14));
   InvoiceStatus _status = InvoiceStatus.draft;
   final _taxRateCtrl = TextEditingController(text: '0');
+  final _discountCtrl = TextEditingController(text: '0');
   final _notesCtrl = TextEditingController();
+  final _paymentInstructionsCtrl = TextEditingController();
   final List<_LineItem> _items = [_LineItem()];
   String? _originalNumber;
   bool _loading = false;
@@ -60,21 +62,25 @@ class _InvoiceFormScreenState extends ConsumerState<InvoiceFormScreen> {
   @override
   void dispose() {
     _taxRateCtrl.dispose();
+    _discountCtrl.dispose();
     _notesCtrl.dispose();
+    _paymentInstructionsCtrl.dispose();
     super.dispose();
   }
 
   void _populate(Invoice inv) {
     if (_populated) return;
     _populated = true;
-    _originalNumber = inv.number;
+    _originalNumber = inv.invoiceNumber;
     _selectedCustomerId = inv.customerId;
     _selectedCustomerName = inv.customerName;
     _issueDate = inv.issueDate;
     _dueDate = inv.dueDate;
     _status = inv.status;
     _taxRateCtrl.text = (inv.taxRate * 100).toStringAsFixed(2);
+    _discountCtrl.text = inv.discountAmount.toStringAsFixed(2);
     _notesCtrl.text = inv.notes ?? '';
+    _paymentInstructionsCtrl.text = inv.paymentInstructions ?? '';
     _items
       ..clear()
       ..addAll(inv.items.map((i) => _LineItem(
@@ -103,9 +109,10 @@ class _InvoiceFormScreenState extends ConsumerState<InvoiceFormScreen> {
   }
 
   double get _subtotal => _items.fold(0.0, (s, i) => s + i.total);
+  double get _discount => double.tryParse(_discountCtrl.text) ?? 0;
   double get _taxAmount =>
-      _subtotal * ((double.tryParse(_taxRateCtrl.text) ?? 0) / 100);
-  double get _total => _subtotal + _taxAmount;
+      (_subtotal - _discount) * ((double.tryParse(_taxRateCtrl.text) ?? 0) / 100);
+  double get _total => _subtotal - _discount + _taxAmount;
 
   Future<void> _save() async {
     if (!_formKey.currentState!.validate()) return;
@@ -128,7 +135,7 @@ class _InvoiceFormScreenState extends ConsumerState<InvoiceFormScreen> {
           .toList();
       final invoice = Invoice(
         id: _isEdit ? widget.invoiceId! : _uuid.v4(),
-        number: _isEdit
+        invoiceNumber: _isEdit
             ? (_originalNumber ?? widget.invoiceId!)
             : 'INV-${DateTime.now().millisecondsSinceEpoch}',
         customerId: _selectedCustomerId!,
@@ -138,7 +145,11 @@ class _InvoiceFormScreenState extends ConsumerState<InvoiceFormScreen> {
         items: items,
         status: _isEdit ? _status : InvoiceStatus.draft,
         taxRate: taxRate,
+        discountAmount: _discount,
         notes: _notesCtrl.text.trim().isEmpty ? null : _notesCtrl.text.trim(),
+        paymentInstructions: _paymentInstructionsCtrl.text.trim().isEmpty
+            ? null
+            : _paymentInstructionsCtrl.text.trim(),
       );
       if (_isEdit) {
         await repo.update(invoice);
@@ -279,13 +290,22 @@ class _InvoiceFormScreenState extends ConsumerState<InvoiceFormScreen> {
                 ),
               ),
               const SizedBox(height: AppSpacing.lg),
-              // Tax & notes
+              // Tax, discount & notes
               ResponsiveContent(
                 maxWidth: 640,
                 child: AppCard(
                   padding: const EdgeInsets.all(AppSpacing.xl),
                   child: Column(
                     children: [
+                      AppTextField(
+                        label: 'Discount amount',
+                        hint: '0.00',
+                        controller: _discountCtrl,
+                        prefixIcon: Icons.discount_outlined,
+                        keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                        onChanged: (_) => setState(() {}),
+                      ),
+                      const SizedBox(height: AppSpacing.lg),
                       AppTextField(
                         label: 'Tax rate (%)',
                         hint: '0',
@@ -302,6 +322,14 @@ class _InvoiceFormScreenState extends ConsumerState<InvoiceFormScreen> {
                         prefixIcon: Icons.notes_rounded,
                         maxLines: 3,
                       ),
+                      const SizedBox(height: AppSpacing.lg),
+                      AppTextField(
+                        label: 'Payment instructions',
+                        hint: 'Bank transfer to account...',
+                        controller: _paymentInstructionsCtrl,
+                        prefixIcon: Icons.account_balance_outlined,
+                        maxLines: 3,
+                      ),
                     ],
                   ),
                 ),
@@ -315,6 +343,10 @@ class _InvoiceFormScreenState extends ConsumerState<InvoiceFormScreen> {
                   child: Column(
                     children: [
                       _TotalRow(label: 'Subtotal', amount: _subtotal),
+                      if (_discount > 0) ...[
+                        const SizedBox(height: AppSpacing.sm),
+                        _TotalRow(label: 'Discount', amount: -_discount),
+                      ],
                       const SizedBox(height: AppSpacing.sm),
                       _TotalRow(
                         label:

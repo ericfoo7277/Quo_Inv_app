@@ -49,9 +49,7 @@ class CustomerDocumentSection extends StatelessWidget {
                   child: AnimatedListItem(
                     index: entry.key,
                     child: DocumentCard(
-                      number: entry.value.number,
-                      customerName: entry.value.customerName,
-                      meta: 'Due ${_date(entry.value.dueDate)}',
+                      number: entry.value.invoiceNumber,
                       amount: _currency(
                           context, entry.value.currency, entry.value.total),
                       statusLabel: entry.value.status.label,
@@ -72,9 +70,7 @@ class CustomerDocumentSection extends StatelessWidget {
                   child: AnimatedListItem(
                     index: entry.key,
                     child: DocumentCard(
-                      number: entry.value.number,
-                      customerName: entry.value.customerName,
-                      meta: 'Valid until ${_date(entry.value.validUntil)}',
+                      number: entry.value.quotationNumber,
                       amount: _currency(
                           context, entry.value.currency, entry.value.total),
                       statusLabel: entry.value.status.label,

@@ -35,7 +35,7 @@ class MockQuotationRepository implements QuotationRepository {
     if (search != null && search.isNotEmpty) {
       final s = search.toLowerCase();
       result = result.where((q) =>
-          q.number.toLowerCase().contains(s) ||
+          q.quotationNumber.toLowerCase().contains(s) ||
           q.customerName.toLowerCase().contains(s));
     }
     final sorted = result.toList()
@@ -89,12 +89,13 @@ class MockQuotationRepository implements QuotationRepository {
     }
     final invoice = Invoice(
       id: '',
-      number:
+      invoiceNumber:
           'INV-${DateTime.now().year}-${DateTime.now().millisecondsSinceEpoch.remainder(10000)}',
       customerId: q.customerId,
       customerName: q.customerName,
       issueDate: DateTime.now(),
       dueDate: DateTime.now().add(const Duration(days: 14)),
+      sourceQuotationId: q.id,
       items: q.items
           .map((i) => InvoiceLineItem(
                 description: i.description,

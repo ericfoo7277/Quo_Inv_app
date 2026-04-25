@@ -68,7 +68,7 @@ class QuotationsScreen extends ConsumerWidget {
                     child: AnimatedListItem(
                       index: i,
                       child: DocumentCard(
-                        number: q.number,
+                        number: q.quotationNumber,
                         customerName: q.customerName,
                         meta: 'Valid until ${dateFmt.format(q.validUntil)}',
                         amount: currency.format(q.total),

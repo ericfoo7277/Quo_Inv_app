@@ -49,7 +49,7 @@ class InvoiceDetailScreen extends ConsumerWidget {
             children: [
               ResponsiveContent(
                 child: PremiumScreenHeader(
-                  title: inv.number,
+                  title: inv.invoiceNumber,
                   subtitle: 'Invoice details and payment summary',
                   icon: Icons.receipt_long_rounded,
                 ),
@@ -74,7 +74,7 @@ class InvoiceDetailScreen extends ConsumerWidget {
                   invoiceItems: inv.items,
                   currency: currency,
                   subtotal: inv.subtotal,
-                  tax: inv.taxRate > 0 ? inv.tax : null,
+                  tax: inv.taxRate > 0 ? inv.taxAmount : null,
                   taxLabel: inv.taxRate > 0
                       ? 'Tax (${(inv.taxRate * 100).toStringAsFixed(2)}%)'
                       : null,
@@ -158,7 +158,7 @@ class _ActionSection extends StatelessWidget {
         onPressed: () => showRecordPaymentDialog(
           context,
           invoiceId: invoice.id,
-          invoiceNumber: invoice.number,
+          invoiceNumber: invoice.invoiceNumber,
           customerName: invoice.customerName,
           maxAmount: invoice.total,
         ),

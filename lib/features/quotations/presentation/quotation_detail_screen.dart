@@ -43,7 +43,7 @@ class QuotationDetailScreen extends ConsumerWidget {
             children: [
               ResponsiveContent(
                 child: PremiumScreenHeader(
-                  title: q.number,
+                  title: q.quotationNumber,
                   subtitle: 'Quotation details and conversion actions',
                   icon: Icons.description_rounded,
                 ),

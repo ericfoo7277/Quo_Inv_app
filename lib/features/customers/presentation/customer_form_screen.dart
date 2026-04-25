@@ -28,9 +28,10 @@ class _CustomerFormScreenState extends ConsumerState<CustomerFormScreen> {
   final _emailCtrl = TextEditingController();
   final _companyCtrl = TextEditingController();
   final _phoneCtrl = TextEditingController();
+  final _whatsappCtrl = TextEditingController();
   final _addressCtrl = TextEditingController();
-  final _taxIdCtrl = TextEditingController();
   final _notesCtrl = TextEditingController();
+  bool _isArchived = false;
   bool _loading = false;
   bool _populated = false;
 
@@ -42,8 +43,8 @@ class _CustomerFormScreenState extends ConsumerState<CustomerFormScreen> {
     _emailCtrl.dispose();
     _companyCtrl.dispose();
     _phoneCtrl.dispose();
+    _whatsappCtrl.dispose();
     _addressCtrl.dispose();
-    _taxIdCtrl.dispose();
     _notesCtrl.dispose();
     super.dispose();
   }
@@ -53,11 +54,12 @@ class _CustomerFormScreenState extends ConsumerState<CustomerFormScreen> {
     _populated = true;
     _nameCtrl.text = c.name;
     _emailCtrl.text = c.email;
-    _companyCtrl.text = c.company ?? '';
+    _companyCtrl.text = c.companyName ?? '';
     _phoneCtrl.text = c.phone ?? '';
-    _addressCtrl.text = c.address ?? '';
-    _taxIdCtrl.text = c.taxId ?? '';
+    _whatsappCtrl.text = c.whatsappNumber ?? '';
+    _addressCtrl.text = c.billingAddress ?? '';
     _notesCtrl.text = c.notes ?? '';
+    _isArchived = c.isArchived;
   }
 
   Future<void> _save() async {
@@ -69,11 +71,12 @@ class _CustomerFormScreenState extends ConsumerState<CustomerFormScreen> {
         id: _isEdit ? widget.customerId! : _uuid.v4(),
         name: _nameCtrl.text.trim(),
         email: _emailCtrl.text.trim(),
-        company: _companyCtrl.text.trim().isEmpty ? null : _companyCtrl.text.trim(),
+        companyName: _companyCtrl.text.trim().isEmpty ? null : _companyCtrl.text.trim(),
         phone: _phoneCtrl.text.trim().isEmpty ? null : _phoneCtrl.text.trim(),
-        address: _addressCtrl.text.trim().isEmpty ? null : _addressCtrl.text.trim(),
-        taxId: _taxIdCtrl.text.trim().isEmpty ? null : _taxIdCtrl.text.trim(),
+        whatsappNumber: _whatsappCtrl.text.trim().isEmpty ? null : _whatsappCtrl.text.trim(),
+        billingAddress: _addressCtrl.text.trim().isEmpty ? null : _addressCtrl.text.trim(),
         notes: _notesCtrl.text.trim().isEmpty ? null : _notesCtrl.text.trim(),
+        isArchived: _isArchived,
       );
       if (_isEdit) {
         await repo.update(customer);
@@ -146,18 +149,19 @@ class _CustomerFormScreenState extends ConsumerState<CustomerFormScreen> {
                         ),
                         const SizedBox(height: AppSpacing.lg),
                         AppTextField(
-                          label: 'Address',
+                          label: 'WhatsApp number',
+                          hint: '+1 555 000 0000',
+                          controller: _whatsappCtrl,
+                          prefixIcon: Icons.chat_outlined,
+                          keyboardType: TextInputType.phone,
+                        ),
+                        const SizedBox(height: AppSpacing.lg),
+                        AppTextField(
+                          label: 'Billing address',
                           hint: '123 Main St, City, Country',
                           controller: _addressCtrl,
                           prefixIcon: Icons.location_on_outlined,
                           maxLines: 3,
-                        ),
-                        const SizedBox(height: AppSpacing.lg),
-                        AppTextField(
-                          label: 'Tax ID',
-                          hint: 'e.g. US123456789',
-                          controller: _taxIdCtrl,
-                          prefixIcon: Icons.receipt_outlined,
                         ),
                         const SizedBox(height: AppSpacing.lg),
                         AppTextField(
@@ -168,6 +172,16 @@ class _CustomerFormScreenState extends ConsumerState<CustomerFormScreen> {
                           maxLines: 3,
                         ),
                       ],
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.md),
+                  AppCard(
+                    padding: EdgeInsets.zero,
+                    child: SwitchListTile(
+                      title: const Text('Archive customer'),
+                      subtitle: const Text('Hidden from active customer lists'),
+                      value: _isArchived,
+                      onChanged: (v) => setState(() => _isArchived = v),
                     ),
                   ),
                   const SizedBox(height: AppSpacing.xxl),

@@ -76,8 +76,9 @@ class _RecordPaymentDialogState extends ConsumerState<RecordPaymentDialog> {
         invoiceNumber: widget.invoiceNumber,
         customerName: widget.customerName,
         amount: double.tryParse(_amountCtrl.text) ?? 0,
-        date: _date,
-        method: _method,
+        paymentDate: _date,
+        paymentMethod: _method,
+        referenceNote: _notesCtrl.text.trim().isEmpty ? null : _notesCtrl.text.trim(),
       );
       await ref.read(paymentRepositoryProvider).create(payment);
       if (mounted) Navigator.of(context).pop(true);
