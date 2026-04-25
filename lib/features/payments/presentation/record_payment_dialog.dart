@@ -213,14 +213,11 @@ Future<bool?> showRecordPaymentDialog(
     context: context,
     isScrollControlled: true,
     shape: const RoundedRectangleBorder(borderRadius: AppRadius.sheet),
-    builder: (ctx) => ProviderScope(
-      parent: ProviderScope.containerOf(context),
-      child: RecordPaymentDialog(
-        invoiceId: invoiceId,
-        invoiceNumber: invoiceNumber,
-        customerName: customerName,
-        maxAmount: maxAmount,
-      ),
+    builder: (_) => RecordPaymentDialog(
+      invoiceId: invoiceId,
+      invoiceNumber: invoiceNumber,
+      customerName: customerName,
+      maxAmount: maxAmount,
     ),
   );
 }

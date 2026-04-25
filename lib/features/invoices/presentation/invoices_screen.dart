@@ -24,6 +24,11 @@ class InvoicesScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(title: const Text('Invoices')),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () => context.goNamed(RouteNames.invoiceForm),
+        icon: const Icon(Icons.add_rounded),
+        label: const Text('New invoice'),
+      ),
       body: AsyncValueView(
         value: invoices,
         onRetry: () => ref.invalidate(invoicesProvider),

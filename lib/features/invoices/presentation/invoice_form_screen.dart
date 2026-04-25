@@ -9,7 +9,6 @@ import '../../../core/widgets/app_text_field.dart';
 import '../../../core/widgets/primary_button.dart';
 import '../../../core/widgets/responsive_content.dart';
 import '../../../core/widgets/section_header.dart';
-import '../../../shared/models/customer.dart';
 import '../../../shared/models/invoice.dart';
 import '../../../shared/providers/customers_provider.dart';
 import '../../../shared/providers/invoices_provider.dart';

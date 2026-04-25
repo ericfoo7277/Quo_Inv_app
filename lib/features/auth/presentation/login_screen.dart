@@ -58,7 +58,7 @@ class LoginScreen extends StatelessWidget {
                       Align(
                         alignment: Alignment.centerRight,
                         child: TextButton(
-                          onPressed: () {},
+                          onPressed: () => context.goNamed(RouteNames.forgotPassword),
                           child: const Text('Forgot password?'),
                         ),
                       ),
@@ -72,6 +72,17 @@ class LoginScreen extends StatelessWidget {
                   onPressed: () => context.goNamed(RouteNames.dashboard),
                 ),
                 const SizedBox(height: AppSpacing.lg),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text("Don't have an account? ",
+                        style: theme.textTheme.bodySmall),
+                    TextButton(
+                      onPressed: () => context.goNamed(RouteNames.register),
+                      child: const Text('Create one'),
+                    ),
+                  ],
+                ),
                 Text(
                   'Mock auth for now - ready for Supabase/Firebase later.',
                   textAlign: TextAlign.center,

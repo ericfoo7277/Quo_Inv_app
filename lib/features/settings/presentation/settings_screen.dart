@@ -43,7 +43,7 @@ class SettingsScreen extends ConsumerWidget {
                   icon: Icons.business_outlined,
                   title: 'Business details',
                   subtitle: 'Logo, tax ID and invoice identity',
-                  onTap: () {},
+                  onTap: () => context.goNamed(RouteNames.businessProfile),
                 ),
                 const Divider(height: 1),
                 SettingsTile(
@@ -53,6 +53,37 @@ class SettingsScreen extends ConsumerWidget {
                   onTap: () => context.goNamed(RouteNames.payments),
                 ),
               ],
+            ),
+          ),
+          const SizedBox(height: AppSpacing.lg),
+          AppCard(
+            padding: EdgeInsets.zero,
+            child: Column(
+              children: [
+                SettingsTile(
+                  icon: Icons.tag_rounded,
+                  title: 'Numbering',
+                  subtitle: 'Invoice and quotation number sequences',
+                  onTap: () => context.goNamed(RouteNames.numberingSettings),
+                ),
+                const Divider(height: 1),
+                SettingsTile(
+                  icon: Icons.notes_rounded,
+                  title: 'Default Notes',
+                  subtitle: 'Pre-filled notes for new documents',
+                  onTap: () => context.goNamed(RouteNames.defaultNotes),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: AppSpacing.lg),
+          AppCard(
+            padding: EdgeInsets.zero,
+            child: SettingsTile(
+              icon: Icons.notifications_outlined,
+              title: 'Reminders',
+              subtitle: 'Due date and overdue alerts',
+              onTap: () => context.goNamed(RouteNames.reminderSettings),
             ),
           ),
           const SizedBox(height: AppSpacing.lg),
