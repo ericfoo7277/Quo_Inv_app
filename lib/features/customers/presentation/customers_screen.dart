@@ -23,7 +23,10 @@ class CustomersScreen extends ConsumerWidget {
       appBar: AppBar(
         title: const Text('Customers'),
         actions: [
-          IconButton(icon: const Icon(Icons.add_rounded), onPressed: () {}),
+          IconButton(
+            icon: const Icon(Icons.add_rounded),
+            onPressed: () => context.goNamed(RouteNames.customerForm),
+          ),
         ],
       ),
       body: AsyncValueView(
