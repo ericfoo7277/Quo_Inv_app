@@ -49,6 +49,7 @@ class _QuotationFormScreenState extends ConsumerState<QuotationFormScreen> {
   final _taxRateCtrl = TextEditingController(text: '0');
   final _notesCtrl = TextEditingController();
   final List<_LineItem> _items = [_LineItem()];
+  String? _originalNumber;
   bool _loading = false;
   bool _populated = false;
 
@@ -66,6 +67,7 @@ class _QuotationFormScreenState extends ConsumerState<QuotationFormScreen> {
   void _populate(Quotation q) {
     if (_populated) return;
     _populated = true;
+    _originalNumber = q.number;
     _selectedCustomerId = q.customerId;
     _selectedCustomerName = q.customerName;
     _issueDate = q.issueDate;
@@ -126,7 +128,9 @@ class _QuotationFormScreenState extends ConsumerState<QuotationFormScreen> {
           .toList();
       final quotation = Quotation(
         id: _isEdit ? widget.quotationId! : _uuid.v4(),
-        number: _isEdit ? '' : 'QUO-${DateTime.now().millisecondsSinceEpoch}',
+        number: _isEdit
+            ? (_originalNumber ?? widget.quotationId!)
+            : 'QUO-${DateTime.now().millisecondsSinceEpoch}',
         customerId: _selectedCustomerId!,
         customerName: _selectedCustomerName ?? '',
         issueDate: _issueDate,

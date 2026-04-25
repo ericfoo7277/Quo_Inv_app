@@ -49,6 +49,7 @@ class _InvoiceFormScreenState extends ConsumerState<InvoiceFormScreen> {
   final _taxRateCtrl = TextEditingController(text: '0');
   final _notesCtrl = TextEditingController();
   final List<_LineItem> _items = [_LineItem()];
+  String? _originalNumber;
   bool _loading = false;
   bool _populated = false;
 
@@ -66,6 +67,7 @@ class _InvoiceFormScreenState extends ConsumerState<InvoiceFormScreen> {
   void _populate(Invoice inv) {
     if (_populated) return;
     _populated = true;
+    _originalNumber = inv.number;
     _selectedCustomerId = inv.customerId;
     _selectedCustomerName = inv.customerName;
     _issueDate = inv.issueDate;
@@ -126,7 +128,9 @@ class _InvoiceFormScreenState extends ConsumerState<InvoiceFormScreen> {
           .toList();
       final invoice = Invoice(
         id: _isEdit ? widget.invoiceId! : _uuid.v4(),
-        number: _isEdit ? '' : 'INV-${DateTime.now().millisecondsSinceEpoch}',
+        number: _isEdit
+            ? (_originalNumber ?? widget.invoiceId!)
+            : 'INV-${DateTime.now().millisecondsSinceEpoch}',
         customerId: _selectedCustomerId!,
         customerName: _selectedCustomerName ?? '',
         issueDate: _issueDate,
