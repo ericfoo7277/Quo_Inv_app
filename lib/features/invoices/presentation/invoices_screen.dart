@@ -69,7 +69,7 @@ class InvoicesScreen extends ConsumerWidget {
                     child: AnimatedListItem(
                       index: i,
                       child: DocumentCard(
-                        number: inv.number,
+                        number: inv.invoiceNumber,
                         customerName: inv.customerName,
                         meta: 'Due ${dateFmt.format(inv.dueDate)}',
                         amount: currency.format(inv.total),

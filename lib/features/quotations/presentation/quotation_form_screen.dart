@@ -47,7 +47,9 @@ class _QuotationFormScreenState extends ConsumerState<QuotationFormScreen> {
   DateTime _validUntil = DateTime.now().add(const Duration(days: 30));
   QuotationStatus _status = QuotationStatus.draft;
   final _taxRateCtrl = TextEditingController(text: '0');
+  final _discountCtrl = TextEditingController(text: '0');
   final _notesCtrl = TextEditingController();
+  final _paymentInstructionsCtrl = TextEditingController();
   final List<_LineItem> _items = [_LineItem()];
   String? _originalNumber;
   bool _loading = false;
@@ -60,21 +62,25 @@ class _QuotationFormScreenState extends ConsumerState<QuotationFormScreen> {
   @override
   void dispose() {
     _taxRateCtrl.dispose();
+    _discountCtrl.dispose();
     _notesCtrl.dispose();
+    _paymentInstructionsCtrl.dispose();
     super.dispose();
   }
 
   void _populate(Quotation q) {
     if (_populated) return;
     _populated = true;
-    _originalNumber = q.number;
+    _originalNumber = q.quotationNumber;
     _selectedCustomerId = q.customerId;
     _selectedCustomerName = q.customerName;
     _issueDate = q.issueDate;
     _validUntil = q.validUntil;
     _status = q.status;
     _taxRateCtrl.text = (q.taxRate * 100).toStringAsFixed(2);
+    _discountCtrl.text = q.discountAmount.toStringAsFixed(2);
     _notesCtrl.text = q.notes ?? '';
+    _paymentInstructionsCtrl.text = q.paymentInstructions ?? '';
     _items
       ..clear()
       ..addAll(q.items.map((i) => _LineItem(
@@ -103,9 +109,10 @@ class _QuotationFormScreenState extends ConsumerState<QuotationFormScreen> {
   }
 
   double get _subtotal => _items.fold(0.0, (s, i) => s + i.total);
+  double get _discount => double.tryParse(_discountCtrl.text) ?? 0;
   double get _taxAmount =>
-      _subtotal * ((double.tryParse(_taxRateCtrl.text) ?? 0) / 100);
-  double get _total => _subtotal + _taxAmount;
+      (_subtotal - _discount) * ((double.tryParse(_taxRateCtrl.text) ?? 0) / 100);
+  double get _total => _subtotal - _discount + _taxAmount;
 
   Future<void> _save() async {
     if (!_formKey.currentState!.validate()) return;
@@ -128,7 +135,7 @@ class _QuotationFormScreenState extends ConsumerState<QuotationFormScreen> {
           .toList();
       final quotation = Quotation(
         id: _isEdit ? widget.quotationId! : _uuid.v4(),
-        number: _isEdit
+        quotationNumber: _isEdit
             ? (_originalNumber ?? widget.quotationId!)
             : 'QUO-${DateTime.now().millisecondsSinceEpoch}',
         customerId: _selectedCustomerId!,
@@ -138,7 +145,11 @@ class _QuotationFormScreenState extends ConsumerState<QuotationFormScreen> {
         items: items,
         status: _isEdit ? _status : QuotationStatus.draft,
         taxRate: taxRate,
+        discountAmount: _discount,
         notes: _notesCtrl.text.trim().isEmpty ? null : _notesCtrl.text.trim(),
+        paymentInstructions: _paymentInstructionsCtrl.text.trim().isEmpty
+            ? null
+            : _paymentInstructionsCtrl.text.trim(),
       );
       if (_isEdit) {
         await repo.update(quotation);
@@ -281,6 +292,15 @@ class _QuotationFormScreenState extends ConsumerState<QuotationFormScreen> {
                   child: Column(
                     children: [
                       AppTextField(
+                        label: 'Discount amount',
+                        hint: '0.00',
+                        controller: _discountCtrl,
+                        prefixIcon: Icons.discount_outlined,
+                        keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                        onChanged: (_) => setState(() {}),
+                      ),
+                      const SizedBox(height: AppSpacing.lg),
+                      AppTextField(
                         label: 'Tax rate (%)',
                         hint: '0',
                         controller: _taxRateCtrl,
@@ -296,6 +316,14 @@ class _QuotationFormScreenState extends ConsumerState<QuotationFormScreen> {
                         prefixIcon: Icons.notes_rounded,
                         maxLines: 3,
                       ),
+                      const SizedBox(height: AppSpacing.lg),
+                      AppTextField(
+                        label: 'Payment instructions',
+                        hint: 'Bank transfer to account...',
+                        controller: _paymentInstructionsCtrl,
+                        prefixIcon: Icons.account_balance_outlined,
+                        maxLines: 3,
+                      ),
                     ],
                   ),
                 ),
@@ -308,6 +336,10 @@ class _QuotationFormScreenState extends ConsumerState<QuotationFormScreen> {
                   child: Column(
                     children: [
                       _TotalRow(label: 'Subtotal', amount: _subtotal),
+                      if (_discount > 0) ...[
+                        const SizedBox(height: AppSpacing.sm),
+                        _TotalRow(label: 'Discount', amount: -_discount),
+                      ],
                       const SizedBox(height: AppSpacing.sm),
                       _TotalRow(
                         label:

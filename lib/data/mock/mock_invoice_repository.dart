@@ -31,7 +31,7 @@ class MockInvoiceRepository implements InvoiceRepository {
     if (search != null && search.isNotEmpty) {
       final q = search.toLowerCase();
       result = result.where((i) =>
-          i.number.toLowerCase().contains(q) ||
+          i.invoiceNumber.toLowerCase().contains(q) ||
           i.customerName.toLowerCase().contains(q));
     }
     final sorted = result.toList()

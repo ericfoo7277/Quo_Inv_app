@@ -54,7 +54,7 @@ class PaymentsScreen extends ConsumerWidget {
                   child: AppCard(
                     child: Row(
                       children: [
-                        Icon(_iconFor(p.method),
+                        Icon(_iconFor(p.paymentMethod),
                             color: theme.colorScheme.primary),
                         const SizedBox(width: AppSpacing.md),
                         Expanded(
@@ -65,7 +65,7 @@ class PaymentsScreen extends ConsumerWidget {
                                   style: theme.textTheme.titleSmall),
                               const SizedBox(height: 2),
                               Text(
-                                  '${p.customerName}  •  ${dateFmt.format(p.date)}',
+                              '${p.customerName}  •  ${dateFmt.format(p.paymentDate)}',
                                   style: theme.textTheme.bodySmall),
                             ],
                           ),

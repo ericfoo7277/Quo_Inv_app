@@ -21,9 +21,9 @@ class CustomerProfileCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(customer.name, style: theme.textTheme.titleLarge),
-          if (customer.company != null) ...[
+          if (customer.companyName != null) ...[
             const SizedBox(height: 4),
-            Text(customer.company!, style: theme.textTheme.bodyMedium),
+            Text(customer.companyName!, style: theme.textTheme.bodyMedium),
           ],
           const SizedBox(height: AppSpacing.lg),
           InfoRow(icon: Icons.mail_outline_rounded, text: customer.email),
@@ -31,13 +31,16 @@ class CustomerProfileCard extends StatelessWidget {
             const SizedBox(height: AppSpacing.sm),
             InfoRow(icon: Icons.phone_outlined, text: customer.phone!),
           ],
-          if (customer.address != null) ...[
+          if (customer.whatsappNumber != null) ...[
             const SizedBox(height: AppSpacing.sm),
-            InfoRow(icon: Icons.location_on_outlined, text: customer.address!),
+            InfoRow(
+                icon: Icons.chat_outlined, text: customer.whatsappNumber!),
           ],
-          if (customer.taxId != null) ...[
+          if (customer.billingAddress != null) ...[
             const SizedBox(height: AppSpacing.sm),
-            InfoRow(icon: Icons.badge_outlined, text: customer.taxId!),
+            InfoRow(
+                icon: Icons.location_on_outlined,
+                text: customer.billingAddress!),
           ],
         ],
       ),

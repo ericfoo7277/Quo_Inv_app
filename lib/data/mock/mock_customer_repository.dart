@@ -27,7 +27,7 @@ class MockCustomerRepository implements CustomerRepository {
         .where((c) =>
             c.name.toLowerCase().contains(q) ||
             c.email.toLowerCase().contains(q) ||
-            (c.company?.toLowerCase().contains(q) ?? false))
+            (c.companyName?.toLowerCase().contains(q) ?? false))
         .toList(growable: false);
   }
 

@@ -142,7 +142,7 @@ class DashboardScreen extends ConsumerWidget {
                     child: AnimatedListItem(
                       index: index,
                       child: DocumentCard(
-                        number: inv.number,
+                        number: inv.invoiceNumber,
                         customerName: inv.customerName,
                         meta: DateFormat.yMMMd().format(inv.dueDate),
                         amount: fmt.format(inv.total),

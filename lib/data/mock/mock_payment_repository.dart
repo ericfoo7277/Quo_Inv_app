@@ -12,7 +12,7 @@ class MockPaymentRepository {
 
   Future<List<Payment>> fetchAll() async {
     await Future.delayed(_latency);
-    final sorted = [..._items]..sort((a, b) => b.date.compareTo(a.date));
+    final sorted = [..._items]..sort((a, b) => b.paymentDate.compareTo(a.paymentDate));
     return List.unmodifiable(sorted);
   }
 

@@ -18,6 +18,9 @@ import '../../data/repositories/quotation_repository.dart';
 ///   return SupabaseInvoiceRepository(ref.watch(supabaseClientProvider));
 /// });
 /// ```
+///
+/// BusinessProfile and ReminderSetting providers live in their own dedicated
+/// files: business_profile_provider.dart and reminder_setting_provider.dart.
 
 final customerRepositoryProvider = Provider<CustomerRepository>((ref) {
   return MockCustomerRepository();

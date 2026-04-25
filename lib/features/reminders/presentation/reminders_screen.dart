@@ -150,7 +150,7 @@ class _ReminderCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(invoice.number, style: theme.textTheme.titleSmall),
+                Text(invoice.invoiceNumber, style: theme.textTheme.titleSmall),
                 const SizedBox(height: 2),
                 Text(invoice.customerName, style: theme.textTheme.bodySmall),
                 const SizedBox(height: AppSpacing.sm),
