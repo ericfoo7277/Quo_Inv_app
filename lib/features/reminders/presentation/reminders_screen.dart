@@ -15,6 +15,8 @@ import '../../../core/widgets/status_pill.dart';
 import '../../../shared/models/invoice.dart';
 import '../../../shared/providers/invoices_provider.dart';
 
+String _plural(int n, String word) => '$n $word${n == 1 ? '' : 's'}';
+
 class RemindersScreen extends ConsumerWidget {
   const RemindersScreen({super.key});
 
@@ -71,7 +73,7 @@ class RemindersScreen extends ConsumerWidget {
                 ResponsiveContent(
                   child: SectionHeader(
                     title: 'Overdue',
-                    subtitle: '${overdue.length} invoice${overdue.length == 1 ? '' : 's'} past due',
+                    subtitle: '${_plural(overdue.length, 'invoice')} past due',
                   ),
                 ),
                 const SizedBox(height: AppSpacing.md),
@@ -91,7 +93,7 @@ class RemindersScreen extends ConsumerWidget {
                 ResponsiveContent(
                   child: SectionHeader(
                     title: 'Due soon',
-                    subtitle: '${dueSoon.length} invoice${dueSoon.length == 1 ? '' : 's'} due within 7 days',
+                    subtitle: '${_plural(dueSoon.length, 'invoice')} due within 7 days',
                   ),
                 ),
                 const SizedBox(height: AppSpacing.md),
@@ -131,10 +133,10 @@ class _ReminderCard extends StatelessWidget {
     final currency = NumberFormat.simpleCurrency(name: invoice.currency);
     final diff = invoice.dueDate.difference(today).inDays;
     final daysLabel = isOverdue
-        ? '${diff.abs()} day${diff.abs() == 1 ? '' : 's'} overdue'
+        ? '${_plural(diff.abs(), 'day')} overdue'
         : diff == 0
             ? 'Due today'
-            : 'Due in $diff day${diff == 1 ? '' : 's'}';
+            : 'Due in ${_plural(diff, 'day')}';
     final color = isOverdue ? AppColors.error : AppColors.warning;
 
     return AppCard(
