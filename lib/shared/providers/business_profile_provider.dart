@@ -1,8 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../data/mock/mock_business_profile_repository.dart';
+import '../../data/repositories/business_profile_repository.dart';
 import '../../shared/models/business_profile.dart';
-import '../mock/mock_business_profile_repository.dart';
-import '../repositories/business_profile_repository.dart';
 
 final businessProfileRepositoryProvider =
     Provider<BusinessProfileRepository>((ref) {
