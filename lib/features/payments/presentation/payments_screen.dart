@@ -61,7 +61,7 @@ class PaymentsScreen extends ConsumerWidget {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(p.invoiceNumber,
+                              Text(p.invoiceNumber ?? p.invoiceId,
                                   style: theme.textTheme.titleSmall),
                               const SizedBox(height: 2),
                               Text(
