@@ -1,8 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../data/mock/mock_reminder_setting_repository.dart';
+import '../../data/repositories/reminder_setting_repository.dart';
 import '../../shared/models/reminder_setting.dart';
-import '../mock/mock_reminder_setting_repository.dart';
-import '../repositories/reminder_setting_repository.dart';
 
 final reminderSettingRepositoryProvider =
     Provider<ReminderSettingRepository>((ref) {
