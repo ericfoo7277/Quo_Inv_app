@@ -65,7 +65,7 @@ class PaymentsScreen extends ConsumerWidget {
                                   style: theme.textTheme.titleSmall),
                               const SizedBox(height: 2),
                               Text(
-                              '${p.customerName}  •  ${dateFmt.format(p.paymentDate)}',
+                              '${p.customerName ?? ''}  •  ${dateFmt.format(p.paymentDate)}',
                                   style: theme.textTheme.bodySmall),
                             ],
                           ),

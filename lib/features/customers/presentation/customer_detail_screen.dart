@@ -39,7 +39,7 @@ class CustomerDetailScreen extends ConsumerWidget {
               ResponsiveContent(
                 child: PremiumScreenHeader(
                   title: c.name,
-                  subtitle: c.companyName ?? c.email,
+                  subtitle: c.companyName ?? c.email ?? c.phone,
                   icon: Icons.people_alt_rounded,
                 ),
               ),
