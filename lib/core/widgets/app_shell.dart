@@ -50,6 +50,12 @@ class AppShell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final createRouteName = switch (_currentIndex) {
+      1 => RouteNames.invoiceForm,
+      2 => RouteNames.quotationForm,
+      _ => null,
+    };
+
     return Scaffold(
       body: SafeArea(bottom: false, child: child),
       bottomNavigationBar: NavigationBar(
@@ -64,9 +70,10 @@ class AppShell extends StatelessWidget {
             ),
         ],
       ),
-      floatingActionButton: _currentIndex == 1 || _currentIndex == 2
+      floatingActionButton: createRouteName != null
           ? FloatingActionButton.extended(
-              onPressed: () {},
+              heroTag: null,
+              onPressed: () => context.goNamed(createRouteName),
               icon: const Icon(Icons.add_rounded),
               label: Padding(
                 padding: const EdgeInsets.only(right: AppSpacing.xs),

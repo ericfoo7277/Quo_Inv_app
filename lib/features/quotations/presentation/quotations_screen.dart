@@ -24,11 +24,6 @@ class QuotationsScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(title: const Text('Quotations')),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => context.goNamed(RouteNames.quotationForm),
-        icon: const Icon(Icons.add_rounded),
-        label: const Text('New quotation'),
-      ),
       body: AsyncValueView(
         value: quotations,
         onRetry: () => ref.invalidate(quotationsProvider),

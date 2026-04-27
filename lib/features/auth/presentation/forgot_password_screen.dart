@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/constants/app_spacing.dart';
@@ -8,15 +9,17 @@ import '../../../core/widgets/app_text_field.dart';
 import '../../../core/widgets/premium_screen_header.dart';
 import '../../../core/widgets/primary_button.dart';
 import '../../../core/widgets/responsive_content.dart';
+import '../../../shared/providers/auth_providers.dart';
 
-class ForgotPasswordScreen extends StatefulWidget {
+class ForgotPasswordScreen extends ConsumerStatefulWidget {
   const ForgotPasswordScreen({super.key});
 
   @override
-  State<ForgotPasswordScreen> createState() => _ForgotPasswordScreenState();
+  ConsumerState<ForgotPasswordScreen> createState() =>
+      _ForgotPasswordScreenState();
 }
 
-class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
+class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
   final _formKey = GlobalKey<FormState>();
   final _emailCtrl = TextEditingController();
   bool _loading = false;
@@ -28,18 +31,43 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   }
 
   Future<void> _submit() async {
-    if (!_formKey.currentState!.validate()) return;
+    if (!_formKey.currentState!.validate()) {
+      return;
+    }
+
     setState(() => _loading = true);
-    await Future.delayed(const Duration(milliseconds: 800));
-    if (!mounted) return;
-    setState(() => _loading = false);
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Reset link sent!')),
-    );
+
+    try {
+      await ref.read(authServiceProvider).sendPasswordResetEmail(
+            email: _emailCtrl.text.trim(),
+          );
+
+      if (!mounted) {
+        return;
+      }
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Reset link sent.')),
+      );
+    } catch (error) {
+      if (!mounted) {
+        return;
+      }
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(authErrorMessage(error))),
+      );
+    } finally {
+      if (mounted) {
+        setState(() => _loading = false);
+      }
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    final hasSupabaseConfig = ref.watch(hasSupabaseConfigProvider);
+
     return Scaffold(
       appBar: AppBar(),
       body: SafeArea(
@@ -79,6 +107,13 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                     onPressed: _loading ? null : _submit,
                   ),
                   const SizedBox(height: AppSpacing.lg),
+                  Text(
+                    hasSupabaseConfig
+                        ? 'Supabase auth is active for this build.'
+                        : 'Launch with SUPABASE_URL and SUPABASE_ANON_KEY dart-defines to enable auth.',
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: AppSpacing.sm),
                   Center(
                     child: TextButton(
                       onPressed: () => context.goNamed(RouteNames.login),

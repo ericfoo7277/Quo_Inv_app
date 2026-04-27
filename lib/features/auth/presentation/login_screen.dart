@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/constants/app_radius.dart';
@@ -9,86 +10,166 @@ import '../../../core/widgets/app_card.dart';
 import '../../../core/widgets/app_text_field.dart';
 import '../../../core/widgets/primary_button.dart';
 import '../../../core/widgets/responsive_content.dart';
+import '../../../shared/providers/auth_providers.dart';
 
-class LoginScreen extends StatelessWidget {
+class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
+
+  @override
+  ConsumerState<LoginScreen> createState() => _LoginScreenState();
+}
+
+class _LoginScreenState extends ConsumerState<LoginScreen> {
+  final _formKey = GlobalKey<FormState>();
+  final _emailCtrl = TextEditingController();
+  final _passwordCtrl = TextEditingController();
+  bool _loading = false;
+
+  @override
+  void dispose() {
+    _emailCtrl.dispose();
+    _passwordCtrl.dispose();
+    super.dispose();
+  }
+
+  Future<void> _submit() async {
+    if (!ref.read(hasSupabaseConfigProvider)) {
+      if (!mounted) {
+        return;
+      }
+
+      context.goNamed(RouteNames.dashboard);
+      return;
+    }
+
+    if (!_formKey.currentState!.validate()) {
+      return;
+    }
+
+    setState(() => _loading = true);
+
+    try {
+      await ref.read(authServiceProvider).signIn(
+            email: _emailCtrl.text.trim(),
+            password: _passwordCtrl.text,
+          );
+
+      if (!mounted) {
+        return;
+      }
+
+      context.goNamed(RouteNames.dashboard);
+    } catch (error) {
+      if (!mounted) {
+        return;
+      }
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(authErrorMessage(error))),
+      );
+    } finally {
+      if (mounted) {
+        setState(() => _loading = false);
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final hasSupabaseConfig = ref.watch(hasSupabaseConfigProvider);
+
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(AppSpacing.screenPadding),
           child: ResponsiveContent(
             maxWidth: 520,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                const SizedBox(height: AppSpacing.xxl),
-                const _AuthBrand(),
-                const SizedBox(height: AppSpacing.huge),
-                Text('Welcome back', style: theme.textTheme.headlineMedium),
-                const SizedBox(height: AppSpacing.sm),
-                Text(
-                  'Sign in to keep invoices, quotes and payments moving.',
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    color: theme.colorScheme.onSurface.withValues(alpha: 0.62),
+            child: Form(
+              key: _formKey,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  const SizedBox(height: AppSpacing.xxl),
+                  const _AuthBrand(),
+                  const SizedBox(height: AppSpacing.huge),
+                  Text('Welcome back', style: theme.textTheme.headlineMedium),
+                  const SizedBox(height: AppSpacing.sm),
+                  Text(
+                    'Sign in to keep invoices, quotes and payments moving.',
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: theme.colorScheme.onSurface.withValues(alpha: 0.62),
+                    ),
                   ),
-                ),
-                const SizedBox(height: AppSpacing.xxl),
-                AppCard(
-                  padding: const EdgeInsets.all(AppSpacing.xl),
-                  child: Column(
-                    children: [
-                      const AppTextField(
-                        label: 'Email',
-                        hint: 'you@example.com',
-                        prefixIcon: Icons.mail_outline_rounded,
-                        keyboardType: TextInputType.emailAddress,
-                      ),
-                      const SizedBox(height: AppSpacing.lg),
-                      const AppTextField(
-                        label: 'Password',
-                        hint: '••••••••',
-                        prefixIcon: Icons.lock_outline_rounded,
-                        obscureText: true,
-                      ),
-                      const SizedBox(height: AppSpacing.md),
-                      Align(
-                        alignment: Alignment.centerRight,
-                        child: TextButton(
-                          onPressed: () => context.goNamed(RouteNames.forgotPassword),
-                          child: const Text('Forgot password?'),
+                  const SizedBox(height: AppSpacing.xxl),
+                  AppCard(
+                    padding: const EdgeInsets.all(AppSpacing.xl),
+                    child: Column(
+                      children: [
+                        AppTextField(
+                          label: 'Email',
+                          hint: 'you@example.com',
+                          controller: _emailCtrl,
+                          prefixIcon: Icons.mail_outline_rounded,
+                          keyboardType: TextInputType.emailAddress,
+                          validator: (value) =>
+                              (value == null || !value.contains('@'))
+                                  ? 'Enter a valid email'
+                                  : null,
                         ),
+                        const SizedBox(height: AppSpacing.lg),
+                        AppTextField(
+                          label: 'Password',
+                          hint: '••••••••',
+                          controller: _passwordCtrl,
+                          prefixIcon: Icons.lock_outline_rounded,
+                          obscureText: true,
+                          validator: (value) =>
+                              (value == null || value.isEmpty)
+                                  ? 'Password is required'
+                                  : null,
+                        ),
+                        const SizedBox(height: AppSpacing.md),
+                        Align(
+                          alignment: Alignment.centerRight,
+                          child: TextButton(
+                            onPressed: () =>
+                                context.goNamed(RouteNames.forgotPassword),
+                            child: const Text('Forgot password?'),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.xl),
+                  PrimaryButton(
+                    label: 'Sign in',
+                    icon: Icons.arrow_forward_rounded,
+                    isLoading: _loading,
+                    onPressed: _loading ? null : _submit,
+                  ),
+                  const SizedBox(height: AppSpacing.lg),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text("Don't have an account? ",
+                          style: theme.textTheme.bodySmall),
+                      TextButton(
+                        onPressed: () => context.goNamed(RouteNames.register),
+                        child: const Text('Create one'),
                       ),
                     ],
                   ),
-                ),
-                const SizedBox(height: AppSpacing.xl),
-                PrimaryButton(
-                  label: 'Sign in',
-                  icon: Icons.arrow_forward_rounded,
-                  onPressed: () => context.goNamed(RouteNames.dashboard),
-                ),
-                const SizedBox(height: AppSpacing.lg),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text("Don't have an account? ",
-                        style: theme.textTheme.bodySmall),
-                    TextButton(
-                      onPressed: () => context.goNamed(RouteNames.register),
-                      child: const Text('Create one'),
-                    ),
-                  ],
-                ),
-                Text(
-                  'Mock auth for now - ready for Supabase/Firebase later.',
-                  textAlign: TextAlign.center,
-                  style: theme.textTheme.bodySmall,
-                ),
-              ],
+                  const SizedBox(height: AppSpacing.sm),
+                  Text(
+                    hasSupabaseConfig
+                        ? 'Supabase auth is active for this build.'
+                        : 'Mock mode is active. Sign in will bypass auth until SUPABASE_URL and SUPABASE_ANON_KEY are provided.',
+                    textAlign: TextAlign.center,
+                    style: theme.textTheme.bodySmall,
+                  ),
+                ],
+              ),
             ),
           ),
         ),

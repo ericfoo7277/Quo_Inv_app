@@ -76,40 +76,40 @@ class DashboardScreen extends ConsumerWidget {
               child: LayoutBuilder(
                 builder: (context, constraints) {
                   final compact = constraints.maxWidth < 640;
-                  final children = [
-                    Expanded(
-                      child: MetricCard(
-                        label: 'Paid',
-                        value: currency.format(paidThisMonth),
-                        icon: Icons.verified_rounded,
-                        color: AppColors.success,
-                      ),
-                    ),
-                    if (!compact) const SizedBox(width: AppSpacing.md),
-                    Expanded(
-                      child: MetricCard(
-                        label: 'Active',
-                        value: invoices
-                            .where((i) =>
-                                i.status == InvoiceStatus.sent ||
-                                i.status == InvoiceStatus.overdue)
-                            .length
-                            .toString(),
-                        icon: Icons.schedule_rounded,
-                        color: AppColors.warning,
-                      ),
-                    ),
-                  ];
+                  final paidCard = MetricCard(
+                    label: 'Paid',
+                    value: currency.format(paidThisMonth),
+                    icon: Icons.verified_rounded,
+                    color: AppColors.success,
+                  );
+                  final activeCard = MetricCard(
+                    label: 'Active',
+                    value: invoices
+                        .where((i) =>
+                            i.status == InvoiceStatus.sent ||
+                            i.status == InvoiceStatus.overdue)
+                        .length
+                        .toString(),
+                    icon: Icons.schedule_rounded,
+                    color: AppColors.warning,
+                  );
 
                   return compact
                       ? Column(
+                          mainAxisSize: MainAxisSize.min,
                           children: [
-                            children.first,
+                            paidCard,
                             const SizedBox(height: AppSpacing.md),
-                            children.last,
+                            activeCard,
                           ],
                         )
-                      : Row(children: children);
+                      : Row(
+                          children: [
+                            Expanded(child: paidCard),
+                            const SizedBox(width: AppSpacing.md),
+                            Expanded(child: activeCard),
+                          ],
+                        );
                 },
               ),
             ),

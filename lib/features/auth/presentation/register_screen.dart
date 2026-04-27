@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/constants/app_radius.dart';
@@ -9,15 +10,16 @@ import '../../../core/widgets/app_card.dart';
 import '../../../core/widgets/app_text_field.dart';
 import '../../../core/widgets/primary_button.dart';
 import '../../../core/widgets/responsive_content.dart';
+import '../../../shared/providers/auth_providers.dart';
 
-class RegisterScreen extends StatefulWidget {
+class RegisterScreen extends ConsumerStatefulWidget {
   const RegisterScreen({super.key});
 
   @override
-  State<RegisterScreen> createState() => _RegisterScreenState();
+  ConsumerState<RegisterScreen> createState() => _RegisterScreenState();
 }
 
-class _RegisterScreenState extends State<RegisterScreen> {
+class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   final _formKey = GlobalKey<FormState>();
   final _nameCtrl = TextEditingController();
   final _emailCtrl = TextEditingController();
@@ -35,17 +37,54 @@ class _RegisterScreenState extends State<RegisterScreen> {
   }
 
   Future<void> _submit() async {
-    if (!_formKey.currentState!.validate()) return;
+    if (!_formKey.currentState!.validate()) {
+      return;
+    }
+
     setState(() => _loading = true);
-    await Future.delayed(const Duration(milliseconds: 600));
-    if (!mounted) return;
-    setState(() => _loading = false);
-    context.goNamed(RouteNames.onboarding);
+
+    try {
+      final response = await ref.read(authServiceProvider).signUp(
+            fullName: _nameCtrl.text.trim(),
+            email: _emailCtrl.text.trim(),
+            password: _passwordCtrl.text,
+          );
+
+      if (!mounted) {
+        return;
+      }
+
+      final hasSession = response.session != null;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            hasSession
+                ? 'Account created successfully.'
+                : 'Account created. Confirm your email, then sign in.',
+          ),
+        ),
+      );
+      context.goNamed(hasSession ? RouteNames.onboarding : RouteNames.login);
+    } catch (error) {
+      if (!mounted) {
+        return;
+      }
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(authErrorMessage(error))),
+      );
+    } finally {
+      if (mounted) {
+        setState(() => _loading = false);
+      }
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final hasSupabaseConfig = ref.watch(hasSupabaseConfigProvider);
+
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
@@ -135,7 +174,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   ),
                   const SizedBox(height: AppSpacing.sm),
                   Text(
-                    'Mock auth for now — ready for Supabase/Firebase later.',
+                    hasSupabaseConfig
+                        ? 'Supabase auth is active for this build.'
+                        : 'Launch with SUPABASE_URL and SUPABASE_ANON_KEY dart-defines to enable auth.',
                     textAlign: TextAlign.center,
                     style: theme.textTheme.bodySmall,
                   ),
