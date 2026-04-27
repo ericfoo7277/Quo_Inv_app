@@ -9,7 +9,7 @@ class ReminderSetting {
     this.userId,
     this.remindBeforeDays = 3,
     this.remindOnDueDate = true,
-    this.remindAfterDays = 1,
+    this.remindAfterDays = 3,
     this.enablePushNotifications = true,
     this.enableLocalNotifications = true,
     this.createdAt,

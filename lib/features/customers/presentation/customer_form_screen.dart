@@ -53,7 +53,7 @@ class _CustomerFormScreenState extends ConsumerState<CustomerFormScreen> {
     if (_populated) return;
     _populated = true;
     _nameCtrl.text = c.name;
-    _emailCtrl.text = c.email;
+    _emailCtrl.text = c.email ?? '';
     _companyCtrl.text = c.companyName ?? '';
     _phoneCtrl.text = c.phone ?? '';
     _whatsappCtrl.text = c.whatsappNumber ?? '';
@@ -70,7 +70,7 @@ class _CustomerFormScreenState extends ConsumerState<CustomerFormScreen> {
       final customer = Customer(
         id: _isEdit ? widget.customerId! : _uuid.v4(),
         name: _nameCtrl.text.trim(),
-        email: _emailCtrl.text.trim(),
+        email: _emailCtrl.text.trim().isEmpty ? null : _emailCtrl.text.trim(),
         companyName: _companyCtrl.text.trim().isEmpty ? null : _companyCtrl.text.trim(),
         phone: _phoneCtrl.text.trim().isEmpty ? null : _phoneCtrl.text.trim(),
         whatsappNumber: _whatsappCtrl.text.trim().isEmpty ? null : _whatsappCtrl.text.trim(),
@@ -124,13 +124,11 @@ class _CustomerFormScreenState extends ConsumerState<CustomerFormScreen> {
                         ),
                         const SizedBox(height: AppSpacing.lg),
                         AppTextField(
-                          label: 'Email *',
+                          label: 'Email',
                           hint: 'jane@example.com',
                           controller: _emailCtrl,
                           prefixIcon: Icons.mail_outline_rounded,
                           keyboardType: TextInputType.emailAddress,
-                          validator: (v) =>
-                              (v == null || !v.contains('@')) ? 'Enter a valid email' : null,
                         ),
                         const SizedBox(height: AppSpacing.lg),
                         AppTextField(

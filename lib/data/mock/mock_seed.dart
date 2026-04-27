@@ -80,11 +80,11 @@ class MockSeed {
           taxRate: 0.0875,
           items: const [
             InvoiceLineItem(
-                description: 'Brand identity design',
+                itemName: 'Brand identity design',
                 quantity: 1,
                 unitPrice: 2400),
             InvoiceLineItem(
-                description: 'Logo revisions', quantity: 3, unitPrice: 120),
+                itemName: 'Logo revisions', quantity: 3, unitPrice: 120),
           ],
         ),
         Invoice(
@@ -99,7 +99,7 @@ class MockSeed {
           taxRate: 0.19,
           items: const [
             InvoiceLineItem(
-                description: 'Web development sprint',
+                itemName: 'Web development sprint',
                 quantity: 40,
                 unitPrice: 85),
           ],
@@ -115,7 +115,7 @@ class MockSeed {
           taxRate: 0.18,
           items: const [
             InvoiceLineItem(
-                description: 'Mobile app consulting',
+                itemName: 'Mobile app consulting',
                 quantity: 8,
                 unitPrice: 150),
           ],
@@ -130,7 +130,7 @@ class MockSeed {
           status: InvoiceStatus.draft,
           items: const [
             InvoiceLineItem(
-                description: 'Marketing site redesign',
+                itemName: 'Marketing site redesign',
                 quantity: 1,
                 unitPrice: 4800),
           ],
@@ -146,11 +146,11 @@ class MockSeed {
           amountPaid: 650,
           items: const [
             InvoiceLineItem(
-                description: 'Campaign copywriting',
+                itemName: 'Campaign copywriting',
                 quantity: 12,
                 unitPrice: 95),
             InvoiceLineItem(
-                description: 'Social asset pack', quantity: 1, unitPrice: 650),
+                itemName: 'Social asset pack', quantity: 1, unitPrice: 650),
           ],
         ),
         Invoice(
@@ -165,7 +165,7 @@ class MockSeed {
           taxRate: 0.0875,
           items: const [
             InvoiceLineItem(
-                description: 'Design retainer — April',
+                itemName: 'Design retainer — April',
                 quantity: 1,
                 unitPrice: 1800),
           ],
@@ -181,7 +181,7 @@ class MockSeed {
           status: InvoiceStatus.draft,
           items: const [
             InvoiceLineItem(
-                description: 'Translation services',
+                itemName: 'Translation services',
                 quantity: 20,
                 unitPrice: 4200),
           ],
@@ -199,7 +199,7 @@ class MockSeed {
           status: QuotationStatus.accepted,
           items: const [
             QuotationLineItem(
-                description: 'Design system foundation',
+                itemName: 'Design system foundation',
                 quantity: 1,
                 unitPrice: 5200),
           ],
@@ -216,7 +216,7 @@ class MockSeed {
           taxRate: 0.19,
           items: const [
             QuotationLineItem(
-                description: 'API integration', quantity: 30, unitPrice: 90),
+                itemName: 'API integration', quantity: 30, unitPrice: 90),
           ],
         ),
         Quotation(
@@ -229,7 +229,7 @@ class MockSeed {
           status: QuotationStatus.expired,
           items: const [
             QuotationLineItem(
-                description: 'Landing page', quantity: 1, unitPrice: 1800),
+                itemName: 'Landing page', quantity: 1, unitPrice: 1800),
           ],
         ),
         Quotation(
@@ -242,9 +242,9 @@ class MockSeed {
           status: QuotationStatus.draft,
           items: const [
             QuotationLineItem(
-                description: 'Brand workshop', quantity: 1, unitPrice: 2200),
+                itemName: 'Brand workshop', quantity: 1, unitPrice: 2200),
             QuotationLineItem(
-                description: 'Visual exploration',
+                itemName: 'Visual exploration',
                 quantity: 1,
                 unitPrice: 1400),
           ],
@@ -259,7 +259,7 @@ class MockSeed {
           status: QuotationStatus.declined,
           items: const [
             QuotationLineItem(
-                description: 'iOS prototype', quantity: 1, unitPrice: 3600),
+                itemName: 'iOS prototype', quantity: 1, unitPrice: 3600),
           ],
         ),
       ];

@@ -41,7 +41,7 @@ class DocumentTotalsCard extends StatelessWidget {
     final rows = invoiceItems != null
         ? invoiceItems!
             .map((item) => _LineRow(
-                  description: item.description,
+                  description: item.itemName,
                   meta:
                       '${_qty(item.quantity)} × ${currency.format(item.unitPrice)}',
                   amount: currency.format(item.total),
@@ -49,7 +49,7 @@ class DocumentTotalsCard extends StatelessWidget {
             .toList(growable: false)
         : quotationItems!
             .map((item) => _LineRow(
-                  description: item.description,
+                  description: item.itemName,
                   meta:
                       '${_qty(item.quantity)} × ${currency.format(item.unitPrice)}',
                   amount: currency.format(item.total),

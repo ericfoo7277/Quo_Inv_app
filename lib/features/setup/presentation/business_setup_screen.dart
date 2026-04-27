@@ -23,7 +23,7 @@ class _BusinessSetupScreenState extends State<BusinessSetupScreen> {
   final _phoneCtrl = TextEditingController();
   final _addressCtrl = TextEditingController();
   final _taxIdCtrl = TextEditingController();
-  String _currency = 'USD';
+  String _currency = 'MYR';
   bool _loading = false;
 
   static const _currencies = ['USD', 'EUR', 'GBP', 'MYR', 'SGD', 'AUD'];
@@ -90,7 +90,7 @@ class _BusinessSetupScreenState extends State<BusinessSetupScreen> {
                         const SizedBox(height: AppSpacing.lg),
                         AppTextField(
                           label: 'Phone',
-                          hint: '+1 555 000 0000',
+                          hint: '60123456789',
                           controller: _phoneCtrl,
                           prefixIcon: Icons.phone_outlined,
                           keyboardType: TextInputType.phone,

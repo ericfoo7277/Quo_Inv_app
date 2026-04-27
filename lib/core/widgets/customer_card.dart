@@ -51,7 +51,7 @@ class CustomerCard extends StatelessWidget {
                 Text(customer.name, style: theme.textTheme.titleSmall),
                 const SizedBox(height: 2),
                 Text(
-                  customer.companyName ?? customer.email,
+                  customer.companyName ?? customer.email ?? '',
                   style: theme.textTheme.bodySmall,
                   overflow: TextOverflow.ellipsis,
                 ),

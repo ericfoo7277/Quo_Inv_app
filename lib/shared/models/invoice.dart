@@ -46,11 +46,11 @@ extension InvoiceStatusX on InvoiceStatus {
 ///   quantity, unit_price, line_total, sort_order, created_at)
 class InvoiceLineItem {
   const InvoiceLineItem({
-    required this.description,
+    required this.itemName,
     required this.quantity,
     required this.unitPrice,
     this.id,
-    this.itemName,
+    this.description,
     this.sortOrder = 0,
     this.createdAt,
   });
@@ -58,10 +58,11 @@ class InvoiceLineItem {
   /// Supabase row id. Null for unsaved / locally-created items.
   final String? id;
 
-  /// Short display name / title for the line item (maps to item_name).
-  final String? itemName;
+  /// Primary item name / title shown on the document (maps to item_name in DB).
+  final String itemName;
 
-  final String description;
+  /// Optional longer description for the line item (maps to description in DB).
+  final String? description;
   final double quantity;
   final double unitPrice;
   final int sortOrder;

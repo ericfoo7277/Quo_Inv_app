@@ -31,12 +31,12 @@ class _BusinessProfileScreenState
   final _paymentInstructionsCtrl = TextEditingController();
   final _defaultQuotationNotesCtrl = TextEditingController();
   final _defaultInvoiceNotesCtrl = TextEditingController();
-  final _quoPrefixCtrl = TextEditingController(text: 'QUO');
-  final _invPrefixCtrl = TextEditingController(text: 'INV');
+  final _quoPrefixCtrl = TextEditingController(text: 'Q-');
+  final _invPrefixCtrl = TextEditingController(text: 'INV-');
   final _quoNextCtrl = TextEditingController(text: '1');
   final _invNextCtrl = TextEditingController(text: '1');
-  final _timezoneCtrl = TextEditingController(text: 'UTC');
-  String _currency = 'USD';
+  final _timezoneCtrl = TextEditingController(text: 'Asia/Kuala_Lumpur');
+  String _currency = 'MYR';
   String? _profileId;
   bool _loading = false;
   bool _populated = false;
@@ -111,15 +111,15 @@ class _BusinessProfileScreenState
             ? null
             : _defaultInvoiceNotesCtrl.text.trim(),
         quotationPrefix: _quoPrefixCtrl.text.trim().isEmpty
-            ? 'QUO'
+            ? 'Q-'
             : _quoPrefixCtrl.text.trim(),
         invoicePrefix: _invPrefixCtrl.text.trim().isEmpty
-            ? 'INV'
+            ? 'INV-'
             : _invPrefixCtrl.text.trim(),
         quotationNextNumber: int.tryParse(_quoNextCtrl.text) ?? 1,
         invoiceNextNumber: int.tryParse(_invNextCtrl.text) ?? 1,
         timezone: _timezoneCtrl.text.trim().isEmpty
-            ? 'UTC'
+            ? 'Asia/Kuala_Lumpur'
             : _timezoneCtrl.text.trim(),
       );
       await ref.read(businessProfileRepositoryProvider).save(profile);
@@ -246,7 +246,7 @@ class _BusinessProfileScreenState
                           const SizedBox(height: AppSpacing.lg),
                           AppTextField(
                             label: 'Timezone',
-                            hint: 'e.g. America/New_York',
+                            hint: 'e.g. Asia/Kuala_Lumpur',
                             controller: _timezoneCtrl,
                             prefixIcon: Icons.schedule_outlined,
                           ),
