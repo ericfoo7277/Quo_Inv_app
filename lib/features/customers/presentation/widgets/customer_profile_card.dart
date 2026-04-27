@@ -26,7 +26,8 @@ class CustomerProfileCard extends StatelessWidget {
             Text(customer.companyName!, style: theme.textTheme.bodyMedium),
           ],
           const SizedBox(height: AppSpacing.lg),
-          InfoRow(icon: Icons.mail_outline_rounded, text: customer.email),
+          if (customer.email != null)
+            InfoRow(icon: Icons.mail_outline_rounded, text: customer.email!),
           if (customer.phone != null) ...[
             const SizedBox(height: AppSpacing.sm),
             InfoRow(icon: Icons.phone_outlined, text: customer.phone!),

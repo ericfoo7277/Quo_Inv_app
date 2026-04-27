@@ -10,8 +10,8 @@ class Customer {
   const Customer({
     required this.id,
     required this.name,
-    required this.email,
     this.userId,
+    this.email,
     this.companyName,
     this.phone,
     this.whatsappNumber,
@@ -35,7 +35,7 @@ class Customer {
   /// WhatsApp-specific number, may differ from [phone].
   final String? whatsappNumber;
 
-  final String email;
+  final String? email;
   final String? billingAddress;
   final String? notes;
   final bool isArchived;

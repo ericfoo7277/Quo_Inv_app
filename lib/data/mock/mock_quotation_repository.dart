@@ -98,6 +98,7 @@ class MockQuotationRepository implements QuotationRepository {
       sourceQuotationId: q.id,
       items: q.items
           .map((i) => InvoiceLineItem(
+                itemName: i.itemName,
                 description: i.description,
                 quantity: i.quantity,
                 unitPrice: i.unitPrice,

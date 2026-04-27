@@ -18,11 +18,11 @@ const _uuid = Uuid();
 
 class _LineItem {
   _LineItem({
-    this.description = '',
+    this.itemName = '',
     this.qty = '1',
     this.unitPrice = '0',
   });
-  String description;
+  String itemName;
   String qty;
   String unitPrice;
 
@@ -84,7 +84,7 @@ class _InvoiceFormScreenState extends ConsumerState<InvoiceFormScreen> {
     _items
       ..clear()
       ..addAll(inv.items.map((i) => _LineItem(
-            description: i.description,
+            itemName: i.itemName,
             qty: i.quantity.toString(),
             unitPrice: i.unitPrice.toString(),
           )));
@@ -126,9 +126,9 @@ class _InvoiceFormScreenState extends ConsumerState<InvoiceFormScreen> {
       final repo = ref.read(invoiceRepositoryProvider);
       final taxRate = (double.tryParse(_taxRateCtrl.text) ?? 0) / 100;
       final items = _items
-          .where((i) => i.description.trim().isNotEmpty)
+          .where((i) => i.itemName.trim().isNotEmpty)
           .map((i) => InvoiceLineItem(
-                description: i.description.trim(),
+                itemName: i.itemName.trim(),
                 quantity: double.tryParse(i.qty) ?? 1,
                 unitPrice: double.tryParse(i.unitPrice) ?? 0,
               ))
@@ -437,7 +437,7 @@ class _LineItemRowState extends State<_LineItemRow> {
   @override
   void initState() {
     super.initState();
-    _descCtrl = TextEditingController(text: widget.item.description);
+    _descCtrl = TextEditingController(text: widget.item.itemName);
     _qtyCtrl = TextEditingController(text: widget.item.qty);
     _priceCtrl = TextEditingController(text: widget.item.unitPrice);
   }
@@ -460,10 +460,10 @@ class _LineItemRowState extends State<_LineItemRow> {
           Expanded(
             flex: 4,
             child: AppTextField(
-              hint: 'Description',
+              hint: 'Item name',
               controller: _descCtrl,
               onChanged: (v) {
-                widget.item.description = v;
+                widget.item.itemName = v;
                 widget.onChanged();
               },
             ),
