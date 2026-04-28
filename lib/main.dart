@@ -27,7 +27,7 @@ Future<void> main() async {
       overrides: [
         appConfigProvider.overrideWithValue(appConfig),
       ],
-      child: const QuoInvApp(),
+      child: const QuoSwiftApp(),
     ),
   );
 }

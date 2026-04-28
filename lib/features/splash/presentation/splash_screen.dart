@@ -43,6 +43,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     final authSession = ref.watch(authSessionProvider);
+    final theme = Theme.of(context);
 
     if (_minimumDelayElapsed) {
       authSession.when(
@@ -59,19 +60,41 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
     return Scaffold(
       body: Container(
         decoration: const BoxDecoration(gradient: AppColors.primaryGradient),
-        child: const Center(
+        child: Center(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(Icons.receipt_long_rounded, size: 72, color: Colors.white),
-              SizedBox(height: 16),
-              Text(
-                'Quo Inv',
-                style: TextStyle(
+              Container(
+                width: 92,
+                height: 92,
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.16),
+                  borderRadius: BorderRadius.circular(28),
+                  border: Border.all(
+                    color: Colors.white.withValues(alpha: 0.22),
+                  ),
+                ),
+                child: const Icon(
+                  Icons.receipt_long_rounded,
+                  size: 48,
                   color: Colors.white,
-                  fontSize: 28,
-                  fontWeight: FontWeight.w700,
-                  letterSpacing: -0.5,
+                ),
+              ),
+              const SizedBox(height: 20),
+              Text(
+                'QuoSwift',
+                style: theme.textTheme.displaySmall?.copyWith(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: -1,
+                ),
+              ),
+              const SizedBox(height: 10),
+              Text(
+                'Create, send, and track quotes and invoices.',
+                textAlign: TextAlign.center,
+                style: theme.textTheme.bodyLarge?.copyWith(
+                  color: Colors.white.withValues(alpha: 0.82),
                 ),
               ),
             ],

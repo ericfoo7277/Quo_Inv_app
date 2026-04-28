@@ -40,7 +40,7 @@ class DashboardScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Hello 👋'),
+        title: const Text('QuoSwift'),
         actions: [
           IconButton(
             icon: const Icon(Icons.notifications_none_rounded),
@@ -56,10 +56,27 @@ class DashboardScreen extends ConsumerWidget {
         child: ListView(
           padding: const EdgeInsets.all(AppSpacing.screenPadding),
           children: [
-            const PremiumScreenHeader(
+            PremiumScreenHeader(
               title: 'Dashboard',
-              subtitle: 'A calm view of your cash flow.',
+              subtitle: 'QuoSwift keeps your quotes and invoices moving.',
               icon: Icons.auto_graph_rounded,
+              trailing: Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.md,
+                  vertical: AppSpacing.sm,
+                ),
+                decoration: BoxDecoration(
+                  color: AppColors.primary.withValues(alpha: 0.10),
+                  borderRadius: BorderRadius.circular(999),
+                ),
+                child: Text(
+                  'QuoSwift',
+                  style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                    color: AppColors.primary,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ),
             ),
             const SizedBox(height: AppSpacing.xxl),
             ResponsiveContent(

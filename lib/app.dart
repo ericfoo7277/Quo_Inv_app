@@ -5,8 +5,8 @@ import 'core/router/app_router.dart';
 import 'core/theme/app_theme.dart';
 import 'shared/providers/theme_provider.dart';
 
-class QuoInvApp extends ConsumerWidget {
-  const QuoInvApp({super.key});
+class QuoSwiftApp extends ConsumerWidget {
+  const QuoSwiftApp({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -14,7 +14,7 @@ class QuoInvApp extends ConsumerWidget {
     final themeMode = ref.watch(themeModeProvider);
 
     return MaterialApp.router(
-      title: 'Quo Inv',
+      title: 'QuoSwift',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.light(),
       darkTheme: AppTheme.dark(),

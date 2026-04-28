@@ -10,9 +10,9 @@ This guide walks you step-by-step through creating a new Supabase project, creat
 2. Click **New project**.
 3. Fill in:
    - **Organization** – your personal or team organisation
-   - **Project name** – e.g. `quoinv-prod`
+   - **Project name** – e.g. `QuoSwift`
    - **Database password** – generate a strong password and save it safely
-   - **Region** – choose the region closest to your users (e.g. `Southeast Asia (Singapore)` for Malaysian users)
+   - **Region** – choose the region closest to your users (e.g. `Southeast Asia (Singapore)`)
 4. Click **Create new project** and wait ~2 minutes for provisioning.
 
 ---
