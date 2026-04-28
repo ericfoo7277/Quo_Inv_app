@@ -31,3 +31,12 @@ Future<void> main() async {
     ),
   );
 }
+
+/// Convenience getter – access the Supabase client anywhere in the app
+/// without looking it up through the widget tree.
+///
+/// Example:
+/// ```dart
+/// final data = await supabase.from('customers').select();
+/// ```
+SupabaseClient get supabase => Supabase.instance.client;
