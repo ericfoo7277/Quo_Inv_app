@@ -166,7 +166,7 @@ class DashboardScreen extends ConsumerWidget {
                         statusLabel: inv.status.label,
                         statusColor: inv.status.color,
                         icon: Icons.receipt_long_rounded,
-                        onTap: () => context.goNamed(
+                        onTap: () => context.pushNamed(
                           RouteNames.invoiceDetail,
                           pathParameters: {'id': inv.id},
                         ),

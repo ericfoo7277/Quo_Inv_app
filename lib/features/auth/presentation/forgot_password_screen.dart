@@ -69,7 +69,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
     final hasSupabaseConfig = ref.watch(hasSupabaseConfigProvider);
 
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(title: const Text('Forgot password')),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(AppSpacing.screenPadding),

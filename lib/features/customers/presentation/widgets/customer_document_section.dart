@@ -57,7 +57,7 @@ class CustomerDocumentSection extends StatelessWidget {
                       statusLabel: entry.value.status.label,
                       statusColor: entry.value.status.color,
                       icon: Icons.receipt_long_rounded,
-                      onTap: () => context.goNamed(
+                      onTap: () => context.pushNamed(
                         RouteNames.invoiceDetail,
                         pathParameters: {'id': entry.value.id},
                       ),
@@ -80,7 +80,7 @@ class CustomerDocumentSection extends StatelessWidget {
                       statusLabel: entry.value.status.label,
                       statusColor: entry.value.status.color,
                       icon: Icons.description_rounded,
-                      onTap: () => context.goNamed(
+                      onTap: () => context.pushNamed(
                         RouteNames.quotationDetail,
                         pathParameters: {'id': entry.value.id},
                       ),

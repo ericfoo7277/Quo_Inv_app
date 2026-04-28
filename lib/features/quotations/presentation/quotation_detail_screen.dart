@@ -26,9 +26,15 @@ class QuotationDetailScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final quoteAsync = ref.watch(quotationByIdProvider(id));
     final dateFmt = DateFormat.yMMMd();
+    final appBarTitle = quoteAsync.maybeWhen(
+      data: (q) => q == null
+          ? 'Quotation'
+          : 'Quotation ${q.quotationNumber} • ${q.status.label}',
+      orElse: () => 'Quotation',
+    );
 
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(title: Text(appBarTitle)),
       body: AsyncValueView(
         value: quoteAsync,
         onRetry: () => ref.invalidate(quotationByIdProvider(id)),
@@ -55,7 +61,7 @@ class QuotationDetailScreen extends ConsumerWidget {
                   subtitle: 'Valid until ${dateFmt.format(q.validUntil)}',
                   statusLabel: q.status.label,
                   statusColor: q.status.color,
-                  onTap: () => context.goNamed(
+                  onTap: () => context.pushNamed(
                     RouteNames.customerDetail,
                     pathParameters: {'id': q.customerId},
                   ),

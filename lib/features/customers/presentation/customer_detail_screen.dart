@@ -22,9 +22,13 @@ class CustomerDetailScreen extends ConsumerWidget {
     final customer = ref.watch(customerByIdProvider(id));
     final invoices = ref.watch(invoicesByCustomerProvider(id));
     final quotations = ref.watch(quotationsByCustomerProvider(id));
+    final appBarTitle = customer.maybeWhen(
+      data: (c) => c?.name ?? 'Customer',
+      orElse: () => 'Customer',
+    );
 
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(title: Text(appBarTitle)),
       body: AsyncValueView(
         value: customer,
         onRetry: () => ref.invalidate(customerByIdProvider(id)),

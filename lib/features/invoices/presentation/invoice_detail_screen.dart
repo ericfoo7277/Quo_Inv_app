@@ -29,8 +29,16 @@ class InvoiceDetailScreen extends ConsumerWidget {
     final invoiceAsync = ref.watch(invoiceByIdProvider(id));
     final dateFmt = DateFormat.yMMMd();
 
+    final appBarTitle = invoiceAsync.maybeWhen(
+      data: (inv) => inv == null
+          ? 'Invoice'
+          : 'Invoice ${inv.invoiceNumber} • ${inv.status.label}',
+      orElse: () => 'Invoice',
+    );
+
     return Scaffold(
       appBar: AppBar(
+        title: Text(appBarTitle),
         actions: [
           IconButton(icon: const Icon(Icons.share_outlined), onPressed: () {}),
         ],
@@ -62,7 +70,7 @@ class InvoiceDetailScreen extends ConsumerWidget {
                       'Issued ${dateFmt.format(inv.issueDate)}  •  Due ${dateFmt.format(inv.dueDate)}',
                   statusLabel: inv.status.label,
                   statusColor: inv.status.color,
-                  onTap: () => context.goNamed(
+                  onTap: () => context.pushNamed(
                     RouteNames.customerDetail,
                     pathParameters: {'id': inv.customerId},
                   ),

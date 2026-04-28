@@ -140,7 +140,7 @@ class _ReminderCard extends StatelessWidget {
     final color = isOverdue ? AppColors.error : AppColors.warning;
 
     return AppCard(
-      onTap: () => context.goNamed(
+      onTap: () => context.pushNamed(
         RouteNames.invoiceDetail,
         pathParameters: {'id': invoice.id},
       ),
