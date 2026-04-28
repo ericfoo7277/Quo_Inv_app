@@ -115,6 +115,16 @@ app.*.symbols
 # Local temp artifacts
 *.new
 
+# Supabase / environment credentials – NEVER commit real keys
+.env
+.env.*
+!.env.example
+dart_defines.json
+
+# VS Code launch overrides that may contain real dart-define secrets.
+# Keep the placeholder launch.json, but gitignore any *.local variant.
+.vscode/launch.json.local
+
 # Exceptions to above rules.
 !**/ios/**/default.mode1v3
 !**/ios/**/default.mode2v3
