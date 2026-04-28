@@ -1,0 +1,41 @@
+{
+  // VS Code Flutter launch configurations for QuoSwift.
+  //
+  // TO USE YOUR SUPABASE CREDENTIALS:
+  //   1. Select "QuoSwift (Supabase)" in the Run & Debug panel.
+  //   2. Replace the two placeholder values below with your real keys from
+  //      Supabase → Settings → API Keys:
+  //        • SUPABASE_URL    →  your Project URL  (https://xxxx.supabase.co)
+  //        • SUPABASE_ANON_KEY  →  the Publishable / anon key
+  //   3. Save the file, then press F5 (or click the green play button).
+  //
+  // NOTE: This file is committed with placeholder values only.
+  //       If you add real credentials, copy it to .vscode/launch.json.local
+  //       (already gitignored) so they are never pushed to GitHub.
+  //
+  // ALTERNATIVE (command line, no file edit needed):
+  //   flutter run \
+  //     --dart-define=SUPABASE_URL=https://YOUR_PROJECT.supabase.co \
+  //     --dart-define=SUPABASE_ANON_KEY=YOUR_PUBLISHABLE_KEY
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "QuoSwift (mock – no Supabase)",
+      "request": "launch",
+      "type": "dart",
+      "flutterMode": "debug",
+      "program": "lib/main.dart"
+    },
+    {
+      "name": "QuoSwift (Supabase)",
+      "request": "launch",
+      "type": "dart",
+      "flutterMode": "debug",
+      "program": "lib/main.dart",
+      "args": [
+        "--dart-define=SUPABASE_URL=https://YOUR_PROJECT_ID.supabase.co",
+        "--dart-define=SUPABASE_ANON_KEY=YOUR_PUBLISHABLE_ANON_KEY"
+      ]
+    }
+  ]
+}
