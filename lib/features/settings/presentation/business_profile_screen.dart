@@ -1,5 +1,7 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../../core/constants/app_spacing.dart';
@@ -38,6 +40,7 @@ class _BusinessProfileScreenState
   final _timezoneCtrl = TextEditingController(text: 'Asia/Kuala_Lumpur');
   String _currency = 'MYR';
   String? _profileId;
+  String? _logoUrl;
   bool _loading = false;
   bool _populated = false;
 
@@ -55,6 +58,7 @@ class _BusinessProfileScreenState
     if (profile != null && mounted && !_populated) {
       _populated = true;
       _profileId = profile.id;
+      _logoUrl = profile.logoUrl;
       _nameCtrl.text = profile.businessName;
       _emailCtrl.text = profile.email ?? '';
       _phoneCtrl.text = profile.phone ?? '';
@@ -88,6 +92,47 @@ class _BusinessProfileScreenState
     super.dispose();
   }
 
+  Future<void> _pickAndUploadLogo() async {
+    final picker = ImagePicker();
+    final picked = await picker.pickImage(
+      source: ImageSource.gallery,
+      maxWidth: 512,
+      maxHeight: 512,
+      imageQuality: 85,
+    );
+    if (picked == null) return;
+
+    setState(() => _loading = true);
+    try {
+      final bytes = await picked.readAsBytes();
+      final url =
+          await ref.read(businessProfileRepositoryProvider).uploadLogo(bytes);
+      if (mounted) {
+        if (url.isEmpty) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content:
+                  Text('Logo upload requires Supabase. Running in mock mode.'),
+            ),
+          );
+        } else {
+          setState(() => _logoUrl = url);
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Logo uploaded.')),
+          );
+        }
+      }
+    } catch (error) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Logo upload failed: $error')),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _loading = false);
+    }
+  }
+
   Future<void> _save() async {
     if (!_formKey.currentState!.validate()) return;
     setState(() => _loading = true);
@@ -100,6 +145,7 @@ class _BusinessProfileScreenState
         address:
             _addressCtrl.text.trim().isEmpty ? null : _addressCtrl.text.trim(),
         currency: _currency,
+        logoUrl: _logoUrl,
         paymentInstructions: _paymentInstructionsCtrl.text.trim().isEmpty
             ? null
             : _paymentInstructionsCtrl.text.trim(),
@@ -158,17 +204,22 @@ class _BusinessProfileScreenState
                       radius: 48,
                       backgroundColor:
                           theme.colorScheme.primary.withValues(alpha: 0.10),
-                      child: Icon(
-                        Icons.business_rounded,
-                        size: 40,
-                        color: theme.colorScheme.primary,
-                      ),
+                      backgroundImage: _logoUrl != null
+                          ? CachedNetworkImageProvider(_logoUrl!)
+                          : null,
+                      child: _logoUrl == null
+                          ? Icon(
+                              Icons.business_rounded,
+                              size: 40,
+                              color: theme.colorScheme.primary,
+                            )
+                          : null,
                     ),
                     Positioned(
                       bottom: 0,
                       right: 0,
                       child: GestureDetector(
-                        onTap: () {},
+                        onTap: _loading ? null : _pickAndUploadLogo,
                         child: CircleAvatar(
                           radius: 16,
                           backgroundColor: theme.colorScheme.primary,

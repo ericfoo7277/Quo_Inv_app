@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import '../../shared/models/business_profile.dart';
 
 /// Repository contract for business profile persistence.
@@ -15,4 +17,9 @@ abstract class BusinessProfileRepository {
 
   /// Live updates. Emits whenever the profile changes.
   Stream<BusinessProfile?> watch();
+
+  /// Uploads a logo image and returns its public URL.
+  ///
+  /// In mock mode this is a no-op that returns an empty string.
+  Future<String> uploadLogo(Uint8List imageBytes);
 }

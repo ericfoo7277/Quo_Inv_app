@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:typed_data';
 
 import '../../shared/models/business_profile.dart';
 import '../repositories/business_profile_repository.dart';
@@ -46,5 +47,11 @@ class MockBusinessProfileRepository implements BusinessProfileRepository {
   Stream<BusinessProfile?> watch() async* {
     yield _profile;
     yield* _controller.stream;
+  }
+
+  @override
+  Future<String> uploadLogo(Uint8List imageBytes) async {
+    // No-op in mock mode — logo upload requires Supabase Storage.
+    return '';
   }
 }
