@@ -11,6 +11,7 @@ import '../../../core/widgets/app_text_field.dart';
 import '../../../core/widgets/primary_button.dart';
 import '../../../core/widgets/responsive_content.dart';
 import '../../../shared/providers/auth_providers.dart';
+import '../../../shared/providers/business_profile_provider.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
@@ -58,7 +59,18 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         return;
       }
 
-      context.goNamed(RouteNames.dashboard);
+      // After sign-in, check if a business profile exists.
+      // Route to setup if not yet created, otherwise go to dashboard.
+      final profile =
+          await ref.read(businessProfileRepositoryProvider).fetch();
+
+      if (!mounted) {
+        return;
+      }
+
+      context.goNamed(
+        profile == null ? RouteNames.businessSetup : RouteNames.dashboard,
+      );
     } catch (error) {
       if (!mounted) {
         return;
