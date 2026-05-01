@@ -2,6 +2,11 @@ import 'package:flutter/material.dart';
 
 import '../constants/app_spacing.dart';
 
+/// A friendly, professional placeholder shown when a screen has no data yet.
+///
+/// Renders a soft gradient halo behind a large rounded icon, a title, an
+/// optional supporting message, and an optional primary action (typically a
+/// "Create your first …" button).
 class EmptyState extends StatelessWidget {
   const EmptyState({
     super.key,
@@ -19,38 +24,80 @@ class EmptyState extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final primary = theme.colorScheme.primary;
+
     return Center(
-      child: Padding(
+      child: SingleChildScrollView(
         padding: const EdgeInsets.all(AppSpacing.xxl),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(AppSpacing.xl),
-              decoration: BoxDecoration(
-                color: theme.colorScheme.primary.withValues(alpha: 0.08),
-                shape: BoxShape.circle,
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 360),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Decorative halo + icon
+              Stack(
+                alignment: Alignment.center,
+                children: [
+                  Container(
+                    width: 132,
+                    height: 132,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      gradient: RadialGradient(
+                        colors: [
+                          primary.withValues(alpha: 0.18),
+                          primary.withValues(alpha: 0.0),
+                        ],
+                      ),
+                    ),
+                  ),
+                  Container(
+                    width: 88,
+                    height: 88,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      gradient: LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [
+                          primary.withValues(alpha: 0.16),
+                          primary.withValues(alpha: 0.06),
+                        ],
+                      ),
+                      border: Border.all(
+                        color: primary.withValues(alpha: 0.18),
+                        width: 1,
+                      ),
+                    ),
+                    child: Icon(icon, size: 38, color: primary),
+                  ),
+                ],
               ),
-              child: Icon(icon, size: 40, color: theme.colorScheme.primary),
-            ),
-            const SizedBox(height: AppSpacing.lg),
-            Text(title,
-                style: theme.textTheme.titleLarge, textAlign: TextAlign.center),
-            if (message != null) ...[
-              const SizedBox(height: AppSpacing.sm),
+              const SizedBox(height: AppSpacing.xl),
               Text(
-                message!,
-                style: theme.textTheme.bodyMedium?.copyWith(
-                  color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                title,
+                style: theme.textTheme.titleLarge?.copyWith(
+                  fontWeight: FontWeight.w600,
                 ),
                 textAlign: TextAlign.center,
               ),
+              if (message != null) ...[
+                const SizedBox(height: AppSpacing.sm),
+                Text(
+                  message!,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                    height: 1.4,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ],
+              if (action != null) ...[
+                const SizedBox(height: AppSpacing.xl),
+                action!,
+              ],
             ],
-            if (action != null) ...[
-              const SizedBox(height: AppSpacing.xl),
-              action!,
-            ],
-          ],
+          ),
         ),
       ),
     );

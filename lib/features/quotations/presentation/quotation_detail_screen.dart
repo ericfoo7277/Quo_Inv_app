@@ -14,6 +14,7 @@ import '../../../core/router/route_names.dart';
 import '../../../shared/models/quotation.dart';
 import '../../../shared/providers/quotations_provider.dart';
 import '../../../shared/providers/repository_providers.dart';
+import '../../documents/presentation/widgets/document_actions_menu.dart';
 import '../../documents/presentation/widgets/document_header_card.dart';
 import '../../documents/presentation/widgets/document_totals_card.dart';
 
@@ -34,7 +35,16 @@ class QuotationDetailScreen extends ConsumerWidget {
     );
 
     return Scaffold(
-      appBar: AppBar(title: Text(appBarTitle)),
+      appBar: AppBar(
+        title: Text(appBarTitle),
+        actions: [
+          if (quoteAsync.value != null)
+            DocumentActionsMenu.quotation(
+              quotation: quoteAsync.value!,
+              onDuplicate: () => _duplicate(context, ref, quoteAsync.value!),
+            ),
+        ],
+      ),
       body: AsyncValueView(
         value: quoteAsync,
         onRetry: () => ref.invalidate(quotationByIdProvider(id)),
@@ -111,5 +121,41 @@ class QuotationDetailScreen extends ConsumerWidget {
         },
       ),
     );
+  }
+
+  Future<void> _duplicate(
+    BuildContext context,
+    WidgetRef ref,
+    Quotation source,
+  ) async {
+    try {
+      final today = DateTime.now();
+      final validity = source.validUntil
+          .difference(source.issueDate)
+          .inDays
+          .abs();
+      final copy = source.copyWith(
+        id: '',
+        quotationNumber: '', // triggers backend auto-numbering
+        status: QuotationStatus.draft,
+        convertedInvoiceId: null,
+        issueDate: today,
+        validUntil: today.add(Duration(days: validity)),
+        createdAt: null,
+        updatedAt: null,
+      );
+      final created =
+          await ref.read(quotationRepositoryProvider).create(copy);
+      if (!context.mounted) return;
+      context.pushReplacementNamed(
+        RouteNames.quotationDetail,
+        pathParameters: {'id': created.id},
+      );
+    } catch (e) {
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Duplicate failed: $e')),
+      );
+    }
   }
 }

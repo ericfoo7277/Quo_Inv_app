@@ -10,16 +10,19 @@ class SettingsTile extends StatelessWidget {
     required this.title,
     this.subtitle,
     this.onTap,
+    this.iconColor,
   });
 
   final IconData icon;
   final String title;
   final String? subtitle;
   final VoidCallback? onTap;
+  final Color? iconColor;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final accent = iconColor ?? theme.colorScheme.primary;
     return ListTile(
       contentPadding: const EdgeInsets.symmetric(
         horizontal: AppSpacing.lg,
@@ -29,10 +32,10 @@ class SettingsTile extends StatelessWidget {
         width: 38,
         height: 38,
         decoration: BoxDecoration(
-          color: theme.colorScheme.primary.withValues(alpha: 0.09),
+          color: accent.withValues(alpha: 0.09),
           borderRadius: BorderRadius.circular(AppRadius.md),
         ),
-        child: Icon(icon, size: 20, color: theme.colorScheme.primary),
+        child: Icon(icon, size: 20, color: accent),
       ),
       title: Text(title, style: theme.textTheme.titleSmall),
       subtitle: subtitle == null ? null : Text(subtitle!),

@@ -29,10 +29,15 @@ class QuotationsScreen extends ConsumerWidget {
         onRetry: () => ref.invalidate(quotationsProvider),
         data: (list) {
           if (list.isEmpty) {
-            return const EmptyState(
+            return EmptyState(
               title: 'No quotations yet',
-              message: 'Build a polished quote in minutes.',
+              message: 'Build a polished quote in minutes and convert wins into invoices.',
               icon: Icons.description_outlined,
+              action: FilledButton.icon(
+                icon: const Icon(Icons.add_rounded),
+                label: const Text('New quotation'),
+                onPressed: () => context.goNamed(RouteNames.quotationForm),
+              ),
             );
           }
           final sorted = [...list]

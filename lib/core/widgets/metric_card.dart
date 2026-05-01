@@ -11,12 +11,14 @@ class MetricCard extends StatelessWidget {
     required this.value,
     required this.icon,
     this.color,
+    this.onTap,
   });
 
   final String label;
   final String value;
   final IconData icon;
   final Color? color;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -24,6 +26,7 @@ class MetricCard extends StatelessWidget {
     final accent = color ?? theme.colorScheme.primary;
 
     return AppCard(
+      onTap: onTap,
       padding: const EdgeInsets.all(AppSpacing.md),
       child: Row(
         children: [

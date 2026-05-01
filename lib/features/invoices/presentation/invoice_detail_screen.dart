@@ -14,6 +14,8 @@ import '../../../core/widgets/responsive_content.dart';
 import '../../../core/router/route_names.dart';
 import '../../../shared/models/invoice.dart';
 import '../../../shared/providers/invoices_provider.dart';
+import '../../../shared/providers/repository_providers.dart';
+import '../../documents/presentation/widgets/document_actions_menu.dart';
 import '../../documents/presentation/widgets/document_header_card.dart';
 import '../../documents/presentation/widgets/document_totals_card.dart';
 import '../../payments/presentation/record_payment_dialog.dart';
@@ -40,7 +42,11 @@ class InvoiceDetailScreen extends ConsumerWidget {
       appBar: AppBar(
         title: Text(appBarTitle),
         actions: [
-          IconButton(icon: const Icon(Icons.share_outlined), onPressed: () {}),
+          if (invoiceAsync.value != null)
+            DocumentActionsMenu(
+              invoice: invoiceAsync.value!,
+              onDuplicate: () => _duplicate(context, ref, invoiceAsync.value!),
+            ),
         ],
       ),
       body: AsyncValueView(
@@ -111,6 +117,40 @@ class InvoiceDetailScreen extends ConsumerWidget {
         },
       ),
     );
+  }
+
+  Future<void> _duplicate(
+    BuildContext context,
+    WidgetRef ref,
+    Invoice source,
+  ) async {
+    try {
+      final today = DateTime.now();
+      final due = today.add(Duration(
+          days: source.dueDate.difference(source.issueDate).inDays.abs()));
+      final copy = source.copyWith(
+        id: '',
+        invoiceNumber: '', // triggers backend auto-numbering
+        sourceQuotationId: null,
+        status: InvoiceStatus.draft,
+        amountPaid: 0,
+        issueDate: today,
+        dueDate: due,
+        createdAt: null,
+        updatedAt: null,
+      );
+      final created = await ref.read(invoiceRepositoryProvider).create(copy);
+      if (!context.mounted) return;
+      context.pushReplacementNamed(
+        RouteNames.invoiceDetail,
+        pathParameters: {'id': created.id},
+      );
+    } catch (e) {
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Duplicate failed: $e')),
+      );
+    }
   }
 }
 

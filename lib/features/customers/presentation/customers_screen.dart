@@ -34,10 +34,15 @@ class CustomersScreen extends ConsumerWidget {
         onRetry: () => ref.invalidate(customersProvider),
         data: (list) {
           if (list.isEmpty) {
-            return const EmptyState(
+            return EmptyState(
               title: 'No customers yet',
-              message: 'Add your first customer to start invoicing.',
+              message: 'Add your first customer to start sending quotations and invoices.',
               icon: Icons.people_outline_rounded,
+              action: FilledButton.icon(
+                icon: const Icon(Icons.add_rounded),
+                label: const Text('Add customer'),
+                onPressed: () => context.goNamed(RouteNames.customerForm),
+              ),
             );
           }
           return RefreshIndicator(

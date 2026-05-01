@@ -2,7 +2,7 @@
 ///
 /// Schema: reminder_settings(id, user_id, remind_before_days,
 ///   remind_on_due_date, remind_after_days, enable_push_notifications,
-///   enable_local_notifications, created_at, updated_at)
+///   enable_local_notifications, message_template, created_at, updated_at)
 class ReminderSetting {
   const ReminderSetting({
     required this.id,
@@ -12,9 +12,16 @@ class ReminderSetting {
     this.remindAfterDays = 3,
     this.enablePushNotifications = true,
     this.enableLocalNotifications = true,
+    this.messageTemplate = defaultMessageTemplate,
     this.createdAt,
     this.updatedAt,
   });
+
+  /// Default reminder text. Placeholders: {customer}, {invoice}, {amount},
+  /// {due_date}.
+  static const String defaultMessageTemplate =
+      'Hi {customer}, this is a friendly reminder that invoice {invoice} '
+      'for {amount} is due on {due_date}. Thank you!';
 
   final String id;
 
@@ -36,6 +43,9 @@ class ReminderSetting {
   /// On-device local notifications (no network required).
   final bool enableLocalNotifications;
 
+  /// Editable text used to compose reminder messages.
+  final String messageTemplate;
+
   final DateTime? createdAt;
   final DateTime? updatedAt;
 
@@ -47,6 +57,7 @@ class ReminderSetting {
     int? remindAfterDays,
     bool? enablePushNotifications,
     bool? enableLocalNotifications,
+    String? messageTemplate,
     DateTime? createdAt,
     DateTime? updatedAt,
   }) {
@@ -60,6 +71,7 @@ class ReminderSetting {
           enablePushNotifications ?? this.enablePushNotifications,
       enableLocalNotifications:
           enableLocalNotifications ?? this.enableLocalNotifications,
+      messageTemplate: messageTemplate ?? this.messageTemplate,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
     );

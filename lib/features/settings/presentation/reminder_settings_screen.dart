@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:uuid/uuid.dart';
 
 import '../../../core/constants/app_spacing.dart';
 import '../../../core/widgets/app_card.dart';
@@ -10,8 +9,6 @@ import '../../../core/widgets/primary_button.dart';
 import '../../../core/widgets/responsive_content.dart';
 import '../../../shared/models/reminder_setting.dart';
 import '../../../shared/providers/reminder_setting_provider.dart';
-
-const _uuid = Uuid();
 
 class ReminderSettingsScreen extends ConsumerStatefulWidget {
   const ReminderSettingsScreen({super.key});
@@ -28,6 +25,8 @@ class _ReminderSettingsScreenState
   bool _remindOnDueDate = true;
   final _beforeCtrl = TextEditingController(text: '3');
   final _afterCtrl = TextEditingController(text: '1');
+  final _templateCtrl = TextEditingController(
+      text: ReminderSetting.defaultMessageTemplate);
   String? _settingId;
   bool _loading = false;
   bool _populated = false;
@@ -49,6 +48,7 @@ class _ReminderSettingsScreenState
       _afterCtrl.text = setting.remindAfterDays.toString();
       _enablePush = setting.enablePushNotifications;
       _enableLocal = setting.enableLocalNotifications;
+      _templateCtrl.text = setting.messageTemplate;
       setState(() {});
     }
   }
@@ -57,6 +57,7 @@ class _ReminderSettingsScreenState
   void dispose() {
     _beforeCtrl.dispose();
     _afterCtrl.dispose();
+    _templateCtrl.dispose();
     super.dispose();
   }
 
@@ -64,17 +65,28 @@ class _ReminderSettingsScreenState
     setState(() => _loading = true);
     try {
       final setting = ReminderSetting(
-        id: _settingId ?? _uuid.v4(),
+        id: _settingId ?? '',
         remindBeforeDays: int.tryParse(_beforeCtrl.text) ?? 3,
         remindOnDueDate: _remindOnDueDate,
         remindAfterDays: int.tryParse(_afterCtrl.text) ?? 1,
         enablePushNotifications: _enablePush,
         enableLocalNotifications: _enableLocal,
+        messageTemplate: _templateCtrl.text.trim().isEmpty
+            ? ReminderSetting.defaultMessageTemplate
+            : _templateCtrl.text.trim(),
       );
-      await ref.read(reminderSettingRepositoryProvider).save(setting);
+      final saved =
+          await ref.read(reminderSettingRepositoryProvider).save(setting);
+      _settingId = saved.id;
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Reminder settings saved!')));
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to save: $e')),
+        );
       }
     } finally {
       if (mounted) setState(() => _loading = false);
@@ -161,6 +173,33 @@ class _ReminderSettingsScreenState
                       value: _remindOnDueDate,
                       onChanged: (v) =>
                           setState(() => _remindOnDueDate = v),
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.lg),
+                  // Reminder message template
+                  AppCard(
+                    padding: const EdgeInsets.all(AppSpacing.xl),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('Reminder message template',
+                            style: theme.textTheme.titleSmall),
+                        const SizedBox(height: AppSpacing.xs),
+                        Text(
+                          'Used for WhatsApp / share. Placeholders: '
+                          '{customer}, {invoice}, {amount}, {due_date}.',
+                          style: theme.textTheme.bodySmall,
+                        ),
+                        const SizedBox(height: AppSpacing.md),
+                        TextField(
+                          controller: _templateCtrl,
+                          maxLines: 5,
+                          minLines: 3,
+                          decoration: const InputDecoration(
+                            border: OutlineInputBorder(),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                   const SizedBox(height: AppSpacing.lg),

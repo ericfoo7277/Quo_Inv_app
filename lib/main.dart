@@ -5,6 +5,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'app.dart';
 import 'core/config/app_config.dart';
+import 'core/notifications/local_notification_service.dart';
 
 // ---------------------------------------------------------------------------
 // HOW TO CONNECT TO YOUR SUPABASE PROJECT
@@ -47,6 +48,8 @@ Future<void> main() async {
       anonKey: appConfig.supabaseAnonKey,
     );
   }
+
+  await LocalNotificationService.instance.init();
 
   runApp(
     ProviderScope(

@@ -29,7 +29,10 @@ class PaymentsScreen extends ConsumerWidget {
         data: (list) {
           if (list.isEmpty) {
             return const EmptyState(
-                title: 'No payments yet', icon: Icons.payments_outlined);
+              title: 'No payments yet',
+              message: 'Payments you record against invoices will appear here.',
+              icon: Icons.payments_outlined,
+            );
           }
           return ListView.builder(
             padding: const EdgeInsets.all(AppSpacing.screenPadding),

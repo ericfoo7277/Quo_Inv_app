@@ -4,9 +4,11 @@ import 'package:go_router/go_router.dart';
 
 import '../../../core/constants/app_spacing.dart';
 import '../../../core/router/route_names.dart';
+import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/app_card.dart';
 import '../../../core/widgets/premium_screen_header.dart';
 import '../../../core/widgets/settings_tile.dart';
+import '../../../shared/providers/auth_providers.dart';
 import '../../../shared/providers/theme_provider.dart';
 
 class SettingsScreen extends ConsumerWidget {
@@ -120,6 +122,17 @@ class SettingsScreen extends ConsumerWidget {
               ],
             ),
           ),
+          const SizedBox(height: AppSpacing.lg),
+          AppCard(
+            padding: EdgeInsets.zero,
+            child: SettingsTile(
+              icon: Icons.logout_rounded,
+              iconColor: AppColors.error,
+              title: 'Log out',
+              subtitle: 'Sign out of this device',
+              onTap: () => _confirmLogout(context, ref),
+            ),
+          ),
           const SizedBox(height: AppSpacing.xxxl),
           Center(
             child: Text('v1.0.0', style: theme.textTheme.bodySmall),
@@ -127,5 +140,37 @@ class SettingsScreen extends ConsumerWidget {
         ],
       ),
     );
+  }
+
+  Future<void> _confirmLogout(BuildContext context, WidgetRef ref) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Log out?'),
+        content: const Text('You will need to sign in again to access your data.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            style: FilledButton.styleFrom(backgroundColor: AppColors.error),
+            onPressed: () => Navigator.of(ctx).pop(true),
+            child: const Text('Log out'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true) return;
+    try {
+      await ref.read(authServiceProvider).signOut();
+      if (!context.mounted) return;
+      context.goNamed(RouteNames.login);
+    } catch (e) {
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to log out: $e')),
+      );
+    }
   }
 }

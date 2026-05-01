@@ -29,10 +29,15 @@ class InvoicesScreen extends ConsumerWidget {
         onRetry: () => ref.invalidate(invoicesProvider),
         data: (list) {
           if (list.isEmpty) {
-            return const EmptyState(
+            return EmptyState(
               title: 'No invoices yet',
-              message: 'Create your first invoice to get paid faster.',
+              message: 'Create your first invoice and start tracking what you are owed.',
               icon: Icons.receipt_long_outlined,
+              action: FilledButton.icon(
+                icon: const Icon(Icons.add_rounded),
+                label: const Text('New invoice'),
+                onPressed: () => context.goNamed(RouteNames.invoiceForm),
+              ),
             );
           }
           final sorted = [...list]

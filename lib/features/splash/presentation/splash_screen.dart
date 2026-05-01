@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../core/router/route_names.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../shared/providers/auth_providers.dart';
+import '../../../shared/providers/business_profile_provider.dart';
 
 class SplashScreen extends ConsumerStatefulWidget {
   const SplashScreen({super.key});
@@ -16,46 +17,69 @@ class SplashScreen extends ConsumerStatefulWidget {
 class _SplashScreenState extends ConsumerState<SplashScreen> {
   bool _minimumDelayElapsed = false;
   bool _navigated = false;
+  bool _profileCheckStarted = false;
 
   @override
   void initState() {
     super.initState();
     Future.delayed(const Duration(milliseconds: 1200), () {
-      if (mounted) {
-        setState(() => _minimumDelayElapsed = true);
-      }
+      if (!mounted) return;
+      setState(() => _minimumDelayElapsed = true);
+      _tryNavigateFromSession(ref.read(authSessionProvider));
     });
   }
 
-  void _scheduleNavigation(String routeName) {
-    if (_navigated) {
-      return;
-    }
+  /// Called both from the delay callback and from ref.listen so navigation
+  /// fires exactly once regardless of which signal arrives first.
+  void _tryNavigateFromSession(AsyncValue<dynamic> session) {
+    if (!_minimumDelayElapsed) return;
+    session.whenOrNull(
+      data: (s) {
+        if (s == null) {
+          _scheduleNavigation(RouteNames.login);
+        } else {
+          _navigateAfterProfileCheck();
+        }
+      },
+      error: (_, __) => _scheduleNavigation(RouteNames.login),
+    );
+  }
 
+  void _scheduleNavigation(String routeName) {
+    if (_navigated || !mounted) return;
     _navigated = true;
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    context.goNamed(routeName);
+  }
+
+  Future<void> _navigateAfterProfileCheck() async {
+    if (_profileCheckStarted) return;
+    _profileCheckStarted = true;
+
+    try {
+      final profile = await ref
+          .read(businessProfileRepositoryProvider)
+          .fetch()
+          .timeout(const Duration(seconds: 8));
       if (mounted) {
-        context.goNamed(routeName);
+        _scheduleNavigation(
+          profile == null ? RouteNames.businessSetup : RouteNames.dashboard,
+        );
       }
-    });
+    } catch (_) {
+      // Network error, timeout, or table not yet created — default to dashboard.
+      if (mounted) _scheduleNavigation(RouteNames.dashboard);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    final authSession = ref.watch(authSessionProvider);
     final theme = Theme.of(context);
 
-    if (_minimumDelayElapsed) {
-      authSession.when(
-        data: (session) {
-          _scheduleNavigation(
-            session == null ? RouteNames.login : RouteNames.dashboard,
-          );
-        },
-        error: (_, __) => _scheduleNavigation(RouteNames.login),
-        loading: () {},
-      );
-    }
+    // React to session changes that arrive after the minimum delay.
+    ref.listen<AsyncValue<dynamic>>(
+      authSessionProvider,
+      (_, next) => _tryNavigateFromSession(next),
+    );
 
     return Scaffold(
       body: Container(
