@@ -35,11 +35,8 @@ class SupabaseBusinessProfileRepository implements BusinessProfileRepository {
 
   @override
   Future<BusinessProfile?> fetch() async {
-    final data = await _client
-        .from(_table)
-        .select()
-        .eq('user_id', _uid)
-        .maybeSingle();
+    final data =
+        await _client.from(_table).select().eq('user_id', _uid).maybeSingle();
     return data == null ? null : _fromMap(data);
   }
 
@@ -69,12 +66,14 @@ class SupabaseBusinessProfileRepository implements BusinessProfileRepository {
 
   /// Uploads [imageBytes] to Supabase Storage under the authenticated user's
   /// folder and returns the public URL of the uploaded logo.
+  @override
   Future<String> uploadLogo(Uint8List imageBytes) async {
     final path = '$_uid/logo.png';
     await _client.storage.from(_bucket).uploadBinary(
           path,
           imageBytes,
-          fileOptions: const FileOptions(upsert: true, contentType: 'image/png'),
+          fileOptions:
+              const FileOptions(upsert: true, contentType: 'image/png'),
         );
     return _client.storage.from(_bucket).getPublicUrl(path);
   }

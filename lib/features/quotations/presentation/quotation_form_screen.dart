@@ -36,7 +36,8 @@ class QuotationFormScreen extends ConsumerStatefulWidget {
   final String? quotationId;
 
   @override
-  ConsumerState<QuotationFormScreen> createState() => _QuotationFormScreenState();
+  ConsumerState<QuotationFormScreen> createState() =>
+      _QuotationFormScreenState();
 }
 
 class _QuotationFormScreenState extends ConsumerState<QuotationFormScreen> {
@@ -111,14 +112,15 @@ class _QuotationFormScreenState extends ConsumerState<QuotationFormScreen> {
   double get _subtotal => _items.fold(0.0, (s, i) => s + i.total);
   double get _discount => double.tryParse(_discountCtrl.text) ?? 0;
   double get _taxAmount =>
-      (_subtotal - _discount) * ((double.tryParse(_taxRateCtrl.text) ?? 0) / 100);
+      (_subtotal - _discount) *
+      ((double.tryParse(_taxRateCtrl.text) ?? 0) / 100);
   double get _total => _subtotal - _discount + _taxAmount;
 
   Future<void> _save() async {
     if (!_formKey.currentState!.validate()) return;
     if (_selectedCustomerId == null) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(const SnackBar(content: Text('Please select a customer')));
+      ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Please select a customer')));
       return;
     }
     setState(() => _loading = true);
@@ -188,10 +190,11 @@ class _QuotationFormScreenState extends ConsumerState<QuotationFormScreen> {
                     loading: () => const CircularProgressIndicator(),
                     error: (_, __) => const Text('Failed to load customers'),
                     data: (customers) => DropdownButtonFormField<String>(
-                      value: _selectedCustomerId,
+                      initialValue: _selectedCustomerId,
                       decoration: const InputDecoration(
                         labelText: 'Customer',
-                        prefixIcon: Icon(Icons.person_outline_rounded, size: 20),
+                        prefixIcon:
+                            Icon(Icons.person_outline_rounded, size: 20),
                       ),
                       items: customers
                           .map((c) => DropdownMenuItem(
@@ -207,7 +210,8 @@ class _QuotationFormScreenState extends ConsumerState<QuotationFormScreen> {
                           _selectedCustomerName = c.name;
                         });
                       },
-                      validator: (v) => v == null ? 'Please select a customer' : null,
+                      validator: (v) =>
+                          v == null ? 'Please select a customer' : null,
                     ),
                   ),
                 ),
@@ -235,7 +239,7 @@ class _QuotationFormScreenState extends ConsumerState<QuotationFormScreen> {
                       if (_isEdit) ...[
                         const SizedBox(height: AppSpacing.lg),
                         DropdownButtonFormField<QuotationStatus>(
-                          value: _status,
+                          initialValue: _status,
                           decoration: const InputDecoration(
                             labelText: 'Status',
                             prefixIcon: Icon(Icons.flag_outlined, size: 20),
@@ -266,7 +270,8 @@ class _QuotationFormScreenState extends ConsumerState<QuotationFormScreen> {
                       SectionHeader(
                         title: 'Line items',
                         action: TextButton.icon(
-                          onPressed: () => setState(() => _items.add(_LineItem())),
+                          onPressed: () =>
+                              setState(() => _items.add(_LineItem())),
                           icon: const Icon(Icons.add_rounded, size: 18),
                           label: const Text('Add item'),
                         ),
@@ -277,7 +282,8 @@ class _QuotationFormScreenState extends ConsumerState<QuotationFormScreen> {
                             item: e.value,
                             index: e.key,
                             canRemove: _items.length > 1,
-                            onRemove: () => setState(() => _items.removeAt(e.key)),
+                            onRemove: () =>
+                                setState(() => _items.removeAt(e.key)),
                             onChanged: () => setState(() {}),
                           )),
                     ],
@@ -296,7 +302,8 @@ class _QuotationFormScreenState extends ConsumerState<QuotationFormScreen> {
                         hint: '0.00',
                         controller: _discountCtrl,
                         prefixIcon: Icons.discount_outlined,
-                        keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                        keyboardType: const TextInputType.numberWithOptions(
+                            decimal: true),
                         onChanged: (_) => setState(() {}),
                       ),
                       const SizedBox(height: AppSpacing.lg),
@@ -305,7 +312,8 @@ class _QuotationFormScreenState extends ConsumerState<QuotationFormScreen> {
                         hint: '0',
                         controller: _taxRateCtrl,
                         prefixIcon: Icons.percent_rounded,
-                        keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                        keyboardType: const TextInputType.numberWithOptions(
+                            decimal: true),
                         onChanged: (_) => setState(() {}),
                       ),
                       const SizedBox(height: AppSpacing.lg),
@@ -466,7 +474,8 @@ class _LineItemRowState extends State<_LineItemRow> {
             child: AppTextField(
               hint: 'Qty',
               controller: _qtyCtrl,
-              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+              keyboardType:
+                  const TextInputType.numberWithOptions(decimal: true),
               onChanged: (v) {
                 widget.item.qty = v;
                 widget.onChanged();
@@ -479,7 +488,8 @@ class _LineItemRowState extends State<_LineItemRow> {
             child: AppTextField(
               hint: 'Price',
               controller: _priceCtrl,
-              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+              keyboardType:
+                  const TextInputType.numberWithOptions(decimal: true),
               onChanged: (v) {
                 widget.item.unitPrice = v;
                 widget.onChanged();
@@ -511,9 +521,8 @@ class _TotalRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final style = isTotal
-        ? theme.textTheme.titleMedium
-        : theme.textTheme.bodyMedium;
+    final style =
+        isTotal ? theme.textTheme.titleMedium : theme.textTheme.bodyMedium;
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [

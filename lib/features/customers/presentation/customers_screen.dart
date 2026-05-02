@@ -10,6 +10,7 @@ import '../../../core/widgets/customer_card.dart';
 import '../../../core/widgets/empty_state.dart';
 import '../../../core/widgets/premium_screen_header.dart';
 import '../../../core/widgets/responsive_content.dart';
+import '../../../core/widgets/skeleton_list.dart';
 import '../../../shared/providers/customers_provider.dart';
 
 class CustomersScreen extends ConsumerWidget {
@@ -31,12 +32,14 @@ class CustomersScreen extends ConsumerWidget {
       ),
       body: AsyncValueView(
         value: customers,
+        loading: const SkeletonList(),
         onRetry: () => ref.invalidate(customersProvider),
         data: (list) {
           if (list.isEmpty) {
             return EmptyState(
               title: 'No customers yet',
-              message: 'Add your first customer to start sending quotations and invoices.',
+              message:
+                  'Add your first customer to start sending quotations and invoices.',
               icon: Icons.people_outline_rounded,
               action: FilledButton.icon(
                 icon: const Icon(Icons.add_rounded),

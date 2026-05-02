@@ -5,10 +5,12 @@ import '../../data/repositories/customer_repository.dart';
 import '../../data/repositories/invoice_repository.dart';
 import '../../data/repositories/payment_repository.dart';
 import '../../data/repositories/quotation_repository.dart';
+import '../../data/repositories/user_device_repository.dart';
 import '../../data/supabase/supabase_customer_repository.dart';
 import '../../data/supabase/supabase_invoice_repository.dart';
 import '../../data/supabase/supabase_payment_repository.dart';
 import '../../data/supabase/supabase_quotation_repository.dart';
+import '../../data/supabase/supabase_user_device_repository.dart';
 import 'auth_providers.dart';
 
 /// Repository wiring.
@@ -48,4 +50,8 @@ final quotationRepositoryProvider = Provider<QuotationRepository>((ref) {
 
 final paymentRepositoryProvider = Provider<PaymentRepository>((ref) {
   return SupabasePaymentRepository(_requireClient(ref));
+});
+
+final userDeviceRepositoryProvider = Provider<UserDeviceRepository>((ref) {
+  return SupabaseUserDeviceRepository(_requireClient(ref));
 });

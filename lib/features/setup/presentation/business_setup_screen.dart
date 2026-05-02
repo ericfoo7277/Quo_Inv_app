@@ -19,7 +19,8 @@ class BusinessSetupScreen extends ConsumerStatefulWidget {
   const BusinessSetupScreen({super.key});
 
   @override
-  ConsumerState<BusinessSetupScreen> createState() => _BusinessSetupScreenState();
+  ConsumerState<BusinessSetupScreen> createState() =>
+      _BusinessSetupScreenState();
 }
 
 class _BusinessSetupScreenState extends ConsumerState<BusinessSetupScreen> {
@@ -49,13 +50,10 @@ class _BusinessSetupScreenState extends ConsumerState<BusinessSetupScreen> {
       final profile = BusinessProfile(
         id: _uuid.v4(),
         businessName: _nameCtrl.text.trim(),
-        email:
-            _emailCtrl.text.trim().isEmpty ? null : _emailCtrl.text.trim(),
-        phone:
-            _phoneCtrl.text.trim().isEmpty ? null : _phoneCtrl.text.trim(),
-        address: _addressCtrl.text.trim().isEmpty
-            ? null
-            : _addressCtrl.text.trim(),
+        email: _emailCtrl.text.trim().isEmpty ? null : _emailCtrl.text.trim(),
+        phone: _phoneCtrl.text.trim().isEmpty ? null : _phoneCtrl.text.trim(),
+        address:
+            _addressCtrl.text.trim().isEmpty ? null : _addressCtrl.text.trim(),
         currency: _currency,
       );
       await ref.read(businessProfileRepositoryProvider).save(profile);
@@ -87,7 +85,8 @@ class _BusinessSetupScreenState extends ConsumerState<BusinessSetupScreen> {
                 children: [
                   const PremiumScreenHeader(
                     title: 'Set up your business',
-                    subtitle: 'This information appears on your invoices and quotes.',
+                    subtitle:
+                        'This information appears on your invoices and quotes.',
                     icon: Icons.business_rounded,
                   ),
                   const SizedBox(height: AppSpacing.xxl),
@@ -100,8 +99,9 @@ class _BusinessSetupScreenState extends ConsumerState<BusinessSetupScreen> {
                           hint: 'Acme Corp',
                           controller: _nameCtrl,
                           prefixIcon: Icons.business_outlined,
-                          validator: (v) =>
-                              (v == null || v.trim().isEmpty) ? 'Business name is required' : null,
+                          validator: (v) => (v == null || v.trim().isEmpty)
+                              ? 'Business name is required'
+                              : null,
                         ),
                         const SizedBox(height: AppSpacing.lg),
                         AppTextField(
@@ -129,13 +129,15 @@ class _BusinessSetupScreenState extends ConsumerState<BusinessSetupScreen> {
                         ),
                         const SizedBox(height: AppSpacing.lg),
                         DropdownButtonFormField<String>(
-                          value: _currency,
+                          initialValue: _currency,
                           decoration: const InputDecoration(
                             labelText: 'Default currency',
-                            prefixIcon: Icon(Icons.currency_exchange_rounded, size: 20),
+                            prefixIcon:
+                                Icon(Icons.currency_exchange_rounded, size: 20),
                           ),
                           items: _currencies
-                              .map((c) => DropdownMenuItem(value: c, child: Text(c)))
+                              .map((c) =>
+                                  DropdownMenuItem(value: c, child: Text(c)))
                               .toList(),
                           onChanged: (v) {
                             if (v != null) setState(() => _currency = v);
@@ -161,4 +163,3 @@ class _BusinessSetupScreenState extends ConsumerState<BusinessSetupScreen> {
     );
   }
 }
-

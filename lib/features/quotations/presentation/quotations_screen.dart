@@ -11,6 +11,7 @@ import '../../../core/widgets/document_card.dart';
 import '../../../core/widgets/empty_state.dart';
 import '../../../core/widgets/premium_screen_header.dart';
 import '../../../core/widgets/responsive_content.dart';
+import '../../../core/widgets/skeleton_list.dart';
 import '../../../shared/models/quotation.dart';
 import '../../../shared/providers/quotations_provider.dart';
 
@@ -26,12 +27,14 @@ class QuotationsScreen extends ConsumerWidget {
       appBar: AppBar(title: const Text('Quotations')),
       body: AsyncValueView(
         value: quotations,
+        loading: const SkeletonList(),
         onRetry: () => ref.invalidate(quotationsProvider),
         data: (list) {
           if (list.isEmpty) {
             return EmptyState(
               title: 'No quotations yet',
-              message: 'Build a polished quote in minutes and convert wins into invoices.',
+              message:
+                  'Build a polished quote in minutes and convert wins into invoices.',
               icon: Icons.description_outlined,
               action: FilledButton.icon(
                 icon: const Icon(Icons.add_rounded),

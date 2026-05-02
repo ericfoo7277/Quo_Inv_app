@@ -1,3 +1,6 @@
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -5,6 +8,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'app.dart';
 import 'core/config/app_config.dart';
+import 'core/notifications/firebase_messaging_service.dart';
 import 'core/notifications/local_notification_service.dart';
 
 // ---------------------------------------------------------------------------
@@ -47,6 +51,19 @@ Future<void> main() async {
       url: appConfig.supabaseUrl,
       anonKey: appConfig.supabaseAnonKey,
     );
+  }
+
+  // Firebase – uses google-services.json (Android) and GoogleService-Info
+  // .plist (iOS) so we don't need a generated firebase_options.dart.
+  try {
+    await Firebase.initializeApp();
+    FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
+    await FirebaseMessagingService.instance.init();
+  } catch (e, st) {
+    // Don't block app start if Firebase config files are missing in dev.
+    if (kDebugMode) {
+      debugPrint('Firebase init skipped: $e\n$st');
+    }
   }
 
   await LocalNotificationService.instance.init();

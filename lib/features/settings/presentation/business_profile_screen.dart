@@ -23,8 +23,7 @@ class BusinessProfileScreen extends ConsumerStatefulWidget {
       _BusinessProfileScreenState();
 }
 
-class _BusinessProfileScreenState
-    extends ConsumerState<BusinessProfileScreen> {
+class _BusinessProfileScreenState extends ConsumerState<BusinessProfileScreen> {
   final _formKey = GlobalKey<FormState>();
   final _nameCtrl = TextEditingController();
   final _emailCtrl = TextEditingController();
@@ -53,8 +52,7 @@ class _BusinessProfileScreenState
   }
 
   Future<void> _loadProfile() async {
-    final profile =
-        await ref.read(businessProfileRepositoryProvider).fetch();
+    final profile = await ref.read(businessProfileRepositoryProvider).fetch();
     if (profile != null && mounted && !_populated) {
       _populated = true;
       _profileId = profile.id;
@@ -149,10 +147,9 @@ class _BusinessProfileScreenState
         paymentInstructions: _paymentInstructionsCtrl.text.trim().isEmpty
             ? null
             : _paymentInstructionsCtrl.text.trim(),
-        defaultQuotationNotes:
-            _defaultQuotationNotesCtrl.text.trim().isEmpty
-                ? null
-                : _defaultQuotationNotesCtrl.text.trim(),
+        defaultQuotationNotes: _defaultQuotationNotesCtrl.text.trim().isEmpty
+            ? null
+            : _defaultQuotationNotesCtrl.text.trim(),
         defaultInvoiceNotes: _defaultInvoiceNotesCtrl.text.trim().isEmpty
             ? null
             : _defaultInvoiceNotesCtrl.text.trim(),
@@ -279,16 +276,15 @@ class _BusinessProfileScreenState
                           ),
                           const SizedBox(height: AppSpacing.lg),
                           DropdownButtonFormField<String>(
-                            value: _currency,
+                            initialValue: _currency,
                             decoration: const InputDecoration(
                               labelText: 'Default currency',
-                              prefixIcon: Icon(
-                                  Icons.currency_exchange_rounded,
+                              prefixIcon: Icon(Icons.currency_exchange_rounded,
                                   size: 20),
                             ),
                             items: _currencies
-                                .map((c) => DropdownMenuItem(
-                                    value: c, child: Text(c)))
+                                .map((c) =>
+                                    DropdownMenuItem(value: c, child: Text(c)))
                                 .toList(),
                             onChanged: (v) {
                               if (v != null) setState(() => _currency = v);
@@ -370,8 +366,7 @@ class _BusinessProfileScreenState
                         children: [
                           AppTextField(
                             label: 'Default payment instructions',
-                            hint:
-                                'Bank transfer to account: XYZ...',
+                            hint: 'Bank transfer to account: XYZ...',
                             controller: _paymentInstructionsCtrl,
                             prefixIcon: Icons.account_balance_outlined,
                             maxLines: 3,

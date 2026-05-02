@@ -11,6 +11,7 @@ import '../../../core/widgets/document_card.dart';
 import '../../../core/widgets/empty_state.dart';
 import '../../../core/widgets/premium_screen_header.dart';
 import '../../../core/widgets/responsive_content.dart';
+import '../../../core/widgets/skeleton_list.dart';
 import '../../../shared/models/invoice.dart';
 import '../../../shared/providers/invoices_provider.dart';
 
@@ -26,12 +27,14 @@ class InvoicesScreen extends ConsumerWidget {
       appBar: AppBar(title: const Text('Invoices')),
       body: AsyncValueView(
         value: invoices,
+        loading: const SkeletonList(),
         onRetry: () => ref.invalidate(invoicesProvider),
         data: (list) {
           if (list.isEmpty) {
             return EmptyState(
               title: 'No invoices yet',
-              message: 'Create your first invoice and start tracking what you are owed.',
+              message:
+                  'Create your first invoice and start tracking what you are owed.',
               icon: Icons.receipt_long_outlined,
               action: FilledButton.icon(
                 icon: const Icon(Icons.add_rounded),

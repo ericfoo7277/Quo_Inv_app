@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1002198801713",
+    "project_id": "quoswift-1c795",
+    "storage_bucket": "quoswift-1c795.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1002198801713:android:b21bd9e827d47719c96410",
+        "android_client_info": {
+          "package_name": "com.paralleltech.quoswift"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBNaaCuC5EcLekca-FOT2ksqAtZmmk6HRQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
