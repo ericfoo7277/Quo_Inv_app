@@ -5,11 +5,6 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../shared/models/business_profile.dart';
 import '../repositories/business_profile_repository.dart';
 
-/// Supabase-backed implementation of [BusinessProfileRepository].
-///
-/// Each user owns exactly one row in `business_profiles`, keyed by
-/// `user_id = auth.uid()`.  The `save` method upserts on conflict so it
-/// works for both first-time setup and subsequent edits.
 class SupabaseBusinessProfileRepository implements BusinessProfileRepository {
   SupabaseBusinessProfileRepository(this._client);
 
@@ -77,10 +72,6 @@ class SupabaseBusinessProfileRepository implements BusinessProfileRepository {
         );
     return _client.storage.from(_bucket).getPublicUrl(path);
   }
-
-  // ---------------------------------------------------------------------------
-  // Serialisation helpers
-  // ---------------------------------------------------------------------------
 
   Map<String, dynamic> _toMap(BusinessProfile p) => {
         'id': p.id,
