@@ -136,11 +136,7 @@ class SupabaseInvoiceRepository implements InvoiceRepository {
 
   @override
   Future<void> delete(String id) async {
-    await _client
-        .from(_invoices)
-        .delete()
-        .eq('user_id', _uid)
-        .eq('id', id);
+    await _client.from(_invoices).delete().eq('user_id', _uid).eq('id', id);
   }
 
   // ---------------------------------------------------------------------------
@@ -203,13 +199,10 @@ class SupabaseInvoiceRepository implements InvoiceRepository {
     final next = (profile?['invoice_next_number'] as int?) ?? 1;
     final number = '$prefix${next.toString().padLeft(4, '0')}';
 
-    await _client
-        .from(_profiles)
-        .update({
-          'invoice_next_number': next + 1,
-          'updated_at': DateTime.now().toUtc().toIso8601String(),
-        })
-        .eq('user_id', _uid);
+    await _client.from(_profiles).update({
+      'invoice_next_number': next + 1,
+      'updated_at': DateTime.now().toUtc().toIso8601String(),
+    }).eq('user_id', _uid);
 
     return number;
   }
@@ -234,6 +227,7 @@ class SupabaseInvoiceRepository implements InvoiceRepository {
       'total_amount': i.totalAmount,
       'amount_paid': i.amountPaid,
       'balance_due': balance,
+      'tax_rate': i.taxRate,
       'notes': i.notes,
       'payment_instructions': i.paymentInstructions,
       'status': _statusToDb(i.status),
@@ -257,9 +251,7 @@ class SupabaseInvoiceRepository implements InvoiceRepository {
     InvoiceStatus effectiveStatus = storedStatus;
     final hasBalance = total - amountPaid > 0.005;
     final isPastDue = DateTime.now().isAfter(dueDate);
-    if (storedStatus == InvoiceStatus.sent &&
-        hasBalance &&
-        isPastDue) {
+    if (storedStatus == InvoiceStatus.sent && hasBalance && isPastDue) {
       effectiveStatus = InvoiceStatus.overdue;
     } else if (storedStatus == InvoiceStatus.partiallyPaid &&
         hasBalance &&
@@ -278,6 +270,7 @@ class SupabaseInvoiceRepository implements InvoiceRepository {
       dueDate: dueDate,
       items: items,
       status: effectiveStatus,
+      taxRate: (m['tax_rate'] as num?)?.toDouble() ?? 0,
       discountAmount: (m['discount_amount'] as num?)?.toDouble() ?? 0,
       amountPaid: amountPaid,
       notes: m['notes'] as String?,

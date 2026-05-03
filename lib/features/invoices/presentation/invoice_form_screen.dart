@@ -137,8 +137,8 @@ class _InvoiceFormScreenState extends ConsumerState<InvoiceFormScreen> {
       final invoice = Invoice(
         id: _isEdit ? widget.invoiceId! : _uuid.v4(),
         invoiceNumber: _isEdit
-            ? (_originalNumber ?? widget.invoiceId!)
-            : 'INV-${DateTime.now().millisecondsSinceEpoch}',
+            ? (_originalNumber ?? '')
+            : '', // repository allocates from user's prefix + sequence
         customerId: _selectedCustomerId!,
         customerName: _selectedCustomerName ?? '',
         issueDate: _issueDate,
@@ -158,6 +158,12 @@ class _InvoiceFormScreenState extends ConsumerState<InvoiceFormScreen> {
         await repo.create(invoice);
       }
       if (mounted) Navigator.of(context).pop();
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to save: $e')),
+        );
+      }
     } finally {
       if (mounted) setState(() => _loading = false);
     }

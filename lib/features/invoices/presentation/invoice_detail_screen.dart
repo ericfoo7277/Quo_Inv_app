@@ -154,13 +154,37 @@ class InvoiceDetailScreen extends ConsumerWidget {
   }
 }
 
-class _ActionSection extends StatelessWidget {
+class _ActionSection extends ConsumerStatefulWidget {
   const _ActionSection({required this.invoice});
 
   final Invoice invoice;
 
   @override
+  ConsumerState<_ActionSection> createState() => _ActionSectionState();
+}
+
+class _ActionSectionState extends ConsumerState<_ActionSection> {
+  bool _marking = false;
+
+  Future<void> _markAsSent() async {
+    setState(() => _marking = true);
+    try {
+      final updated = widget.invoice.copyWith(status: InvoiceStatus.sent);
+      await ref.read(invoiceRepositoryProvider).update(updated);
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to update status: $e')),
+      );
+    } finally {
+      if (mounted) setState(() => _marking = false);
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final invoice = widget.invoice;
+
     if (invoice.status == InvoiceStatus.paid) {
       return ResponsiveContent(
         child: AppCard(
@@ -189,7 +213,8 @@ class _ActionSection extends StatelessWidget {
         child: PrimaryButton(
           label: 'Mark as sent',
           icon: Icons.send_rounded,
-          onPressed: () => Navigator.of(context).pop(),
+          isLoading: _marking,
+          onPressed: _marking ? null : _markAsSent,
         ),
       );
     }
@@ -198,7 +223,7 @@ class _ActionSection extends StatelessWidget {
       return const SizedBox.shrink();
     }
 
-    // sent or overdue — show Record Payment
+    // sent, partiallyPaid, or overdue — show Record Payment
     return ResponsiveContent(
       child: PrimaryButton(
         label: 'Record payment',
@@ -208,7 +233,7 @@ class _ActionSection extends StatelessWidget {
           invoiceId: invoice.id,
           invoiceNumber: invoice.invoiceNumber,
           customerName: invoice.customerName,
-          maxAmount: invoice.total,
+          maxAmount: invoice.balanceDue,
         ),
       ),
     );

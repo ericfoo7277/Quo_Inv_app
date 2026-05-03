@@ -136,11 +136,7 @@ class SupabaseQuotationRepository implements QuotationRepository {
   @override
   Future<void> delete(String id) async {
     // quotation_items has ON DELETE CASCADE, so removing the parent is enough.
-    await _client
-        .from(_quotations)
-        .delete()
-        .eq('user_id', _uid)
-        .eq('id', id);
+    await _client.from(_quotations).delete().eq('user_id', _uid).eq('id', id);
   }
 
   @override
@@ -175,10 +171,14 @@ class SupabaseQuotationRepository implements QuotationRepository {
     );
     final created = await _invoiceRepository.create(invoice);
 
-    // Link the quotation back to the new invoice.
+    // Link the quotation back to the new invoice and mark it as accepted.
     await _client
         .from(_quotations)
-        .update({'converted_invoice_id': created.id})
+        .update({
+          'converted_invoice_id': created.id,
+          'status': 'accepted',
+          'updated_at': DateTime.now().toUtc().toIso8601String(),
+        })
         .eq('user_id', _uid)
         .eq('id', q.id);
 
@@ -251,13 +251,10 @@ class SupabaseQuotationRepository implements QuotationRepository {
     final next = (profile?['quotation_next_number'] as int?) ?? 1;
     final number = '$prefix${next.toString().padLeft(4, '0')}';
 
-    await _client
-        .from(_profiles)
-        .update({
-          'quotation_next_number': next + 1,
-          'updated_at': DateTime.now().toUtc().toIso8601String(),
-        })
-        .eq('user_id', _uid);
+    await _client.from(_profiles).update({
+      'quotation_next_number': next + 1,
+      'updated_at': DateTime.now().toUtc().toIso8601String(),
+    }).eq('user_id', _uid);
 
     return number;
   }
@@ -276,6 +273,7 @@ class SupabaseQuotationRepository implements QuotationRepository {
         'currency': q.currency,
         'subtotal': q.subtotal,
         'discount_amount': q.discountAmount,
+        'tax_rate': q.taxRate,
         'total_amount': q.totalAmount,
         'notes': q.notes,
         'payment_instructions': q.paymentInstructions,
@@ -302,6 +300,7 @@ class SupabaseQuotationRepository implements QuotationRepository {
           : DateTime.parse(m['issue_date'] as String),
       items: items,
       status: _statusFromDb(m['status'] as String?),
+      taxRate: (m['tax_rate'] as num?)?.toDouble() ?? 0,
       discountAmount: (m['discount_amount'] as num?)?.toDouble() ?? 0,
       notes: m['notes'] as String?,
       paymentInstructions: m['payment_instructions'] as String?,

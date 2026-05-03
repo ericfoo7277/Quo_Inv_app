@@ -138,8 +138,8 @@ class _QuotationFormScreenState extends ConsumerState<QuotationFormScreen> {
       final quotation = Quotation(
         id: _isEdit ? widget.quotationId! : _uuid.v4(),
         quotationNumber: _isEdit
-            ? (_originalNumber ?? widget.quotationId!)
-            : 'QUO-${DateTime.now().millisecondsSinceEpoch}',
+            ? (_originalNumber ?? '')
+            : '', // repository allocates from user's prefix + sequence
         customerId: _selectedCustomerId!,
         customerName: _selectedCustomerName ?? '',
         issueDate: _issueDate,
@@ -159,6 +159,12 @@ class _QuotationFormScreenState extends ConsumerState<QuotationFormScreen> {
         await repo.create(quotation);
       }
       if (mounted) Navigator.of(context).pop();
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to save: $e')),
+        );
+      }
     } finally {
       if (mounted) setState(() => _loading = false);
     }

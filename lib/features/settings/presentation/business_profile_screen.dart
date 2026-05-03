@@ -170,6 +170,12 @@ class _BusinessProfileScreenState extends ConsumerState<BusinessProfileScreen> {
         ScaffoldMessenger.of(context)
             .showSnackBar(const SnackBar(content: Text('Saved!')));
       }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to save: $e')),
+        );
+      }
     } finally {
       if (mounted) setState(() => _loading = false);
     }

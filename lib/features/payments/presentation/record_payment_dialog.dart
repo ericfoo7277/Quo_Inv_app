@@ -78,10 +78,17 @@ class _RecordPaymentDialogState extends ConsumerState<RecordPaymentDialog> {
         amount: double.tryParse(_amountCtrl.text) ?? 0,
         paymentDate: _date,
         paymentMethod: _method,
-        referenceNote: _notesCtrl.text.trim().isEmpty ? null : _notesCtrl.text.trim(),
+        referenceNote:
+            _notesCtrl.text.trim().isEmpty ? null : _notesCtrl.text.trim(),
       );
       await ref.read(paymentRepositoryProvider).create(payment);
       if (mounted) Navigator.of(context).pop(true);
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to record payment: $e')),
+        );
+      }
     } finally {
       if (mounted) setState(() => _loading = false);
     }
@@ -126,7 +133,8 @@ class _RecordPaymentDialogState extends ConsumerState<RecordPaymentDialog> {
                 hint: widget.maxAmount.toStringAsFixed(2),
                 controller: _amountCtrl,
                 prefixIcon: Icons.attach_money_rounded,
-                keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                keyboardType:
+                    const TextInputType.numberWithOptions(decimal: true),
                 validator: (v) {
                   final d = double.tryParse(v ?? '');
                   if (d == null || d <= 0) return 'Enter a valid amount';

@@ -1,5 +1,6 @@
 import 'dart:io' show Platform;
 
+import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -35,11 +36,28 @@ class FirebaseMessagingService {
   static const String _channelId = 'invoice_reminders';
   static const String _channelName = 'Invoice reminders';
 
-  final FirebaseMessaging _messaging = FirebaseMessaging.instance;
+  // Lazy so we never touch FirebaseMessaging before Firebase.initializeApp().
+  FirebaseMessaging? __messaging;
+  FirebaseMessaging get _messaging {
+    __messaging ??= FirebaseMessaging.instance;
+    return __messaging!;
+  }
+
   final FlutterLocalNotificationsPlugin _localPlugin =
       FlutterLocalNotificationsPlugin();
 
   bool _initialized = false;
+
+  /// True only when Firebase was successfully configured during app start.
+  /// When false every public method is a safe no-op.
+  bool get isAvailable {
+    try {
+      Firebase.app();
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
 
   /// Latest known token. Null until [requestPermissionAndGetToken] resolves.
   String? get currentToken => _cachedToken;
@@ -47,6 +65,7 @@ class FirebaseMessagingService {
 
   /// Stream of new tokens (initial + every refresh).
   Stream<String> get tokenStream async* {
+    if (!isAvailable) return;
     if (_cachedToken != null) yield _cachedToken!;
     yield* _messaging.onTokenRefresh;
   }
@@ -54,7 +73,7 @@ class FirebaseMessagingService {
   /// Initialise FCM: register a high-importance Android channel for foreground
   /// banners and configure foreground presentation on iOS.
   Future<void> init() async {
-    if (_initialized) return;
+    if (!isAvailable || _initialized) return;
 
     // iOS: show banner + sound + badge while app is foregrounded.
     await _messaging.setForegroundNotificationPresentationOptions(
@@ -83,6 +102,7 @@ class FirebaseMessagingService {
   /// On iOS the APNs token must be available before FCM can return a token; we
   /// poll briefly to avoid races on cold start.
   Future<String?> requestPermissionAndGetToken() async {
+    if (!isAvailable) return null;
     final settings = await _messaging.requestPermission(
       alert: true,
       badge: true,
@@ -120,6 +140,7 @@ class FirebaseMessagingService {
   Future<void> registerHandlers({
     void Function(RemoteMessage message)? onOpenedApp,
   }) async {
+    if (!isAvailable) return;
     // Cold start tap.
     final initial = await _messaging.getInitialMessage();
     if (initial != null && onOpenedApp != null) {

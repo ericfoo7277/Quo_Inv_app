@@ -71,10 +71,14 @@ class _CustomerFormScreenState extends ConsumerState<CustomerFormScreen> {
         id: _isEdit ? widget.customerId! : _uuid.v4(),
         name: _nameCtrl.text.trim(),
         email: _emailCtrl.text.trim().isEmpty ? null : _emailCtrl.text.trim(),
-        companyName: _companyCtrl.text.trim().isEmpty ? null : _companyCtrl.text.trim(),
+        companyName:
+            _companyCtrl.text.trim().isEmpty ? null : _companyCtrl.text.trim(),
         phone: _phoneCtrl.text.trim().isEmpty ? null : _phoneCtrl.text.trim(),
-        whatsappNumber: _whatsappCtrl.text.trim().isEmpty ? null : _whatsappCtrl.text.trim(),
-        billingAddress: _addressCtrl.text.trim().isEmpty ? null : _addressCtrl.text.trim(),
+        whatsappNumber: _whatsappCtrl.text.trim().isEmpty
+            ? null
+            : _whatsappCtrl.text.trim(),
+        billingAddress:
+            _addressCtrl.text.trim().isEmpty ? null : _addressCtrl.text.trim(),
         notes: _notesCtrl.text.trim().isEmpty ? null : _notesCtrl.text.trim(),
         isArchived: _isArchived,
       );
@@ -84,6 +88,12 @@ class _CustomerFormScreenState extends ConsumerState<CustomerFormScreen> {
         await repo.create(customer);
       }
       if (mounted) Navigator.of(context).pop();
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to save: $e')),
+        );
+      }
     } finally {
       if (mounted) setState(() => _loading = false);
     }
@@ -119,8 +129,9 @@ class _CustomerFormScreenState extends ConsumerState<CustomerFormScreen> {
                           hint: 'Jane Smith',
                           controller: _nameCtrl,
                           prefixIcon: Icons.person_outline_rounded,
-                          validator: (v) =>
-                              (v == null || v.trim().isEmpty) ? 'Name is required' : null,
+                          validator: (v) => (v == null || v.trim().isEmpty)
+                              ? 'Name is required'
+                              : null,
                         ),
                         const SizedBox(height: AppSpacing.lg),
                         AppTextField(

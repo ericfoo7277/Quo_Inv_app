@@ -93,6 +93,7 @@ create table public.quotations (
   currency             text not null default 'MYR',
   subtotal             numeric(12,2) not null default 0,
   discount_amount      numeric(12,2) not null default 0,
+  tax_rate             numeric(5,4)  not null default 0,
   total_amount         numeric(12,2) not null default 0,
   notes                text,
   payment_instructions text,
@@ -140,6 +141,7 @@ create table public.invoices (
   currency             text not null default 'MYR',
   subtotal             numeric(12,2) not null default 0,
   discount_amount      numeric(12,2) not null default 0,
+  tax_rate             numeric(5,4)  not null default 0,
   total_amount         numeric(12,2) not null default 0,
   amount_paid          numeric(12,2) not null default 0,
   balance_due          numeric(12,2) not null default 0,
@@ -248,6 +250,13 @@ create index reminder_logs_invoice_id_idx on public.reminder_logs(invoice_id);
 ---
 
 ## 4. Enable Row-Level Security (RLS)
+
+> **Migrating an existing database?** If your quotations or invoices tables were created before this guide was updated, run this migration first to add the `tax_rate` column:
+>
+> ```sql
+> alter table public.quotations add column if not exists tax_rate numeric(5,4) not null default 0;
+> alter table public.invoices   add column if not exists tax_rate numeric(5,4) not null default 0;
+> ```
 
 RLS ensures every user can only read and write their own data. Run this SQL in the **SQL Editor**:
 

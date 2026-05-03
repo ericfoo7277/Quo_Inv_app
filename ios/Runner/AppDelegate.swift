@@ -10,8 +10,11 @@ import FirebaseCore
   ) -> Bool {
     // Initialise Firebase before the Flutter engine starts so
     // Firebase.initializeApp() on the Dart side picks up the default app.
-    // Reads GoogleService-Info.plist from the Runner bundle.
-    if FirebaseApp.app() == nil {
+    // Guard: only configure when GoogleService-Info.plist is present in the
+    // bundle so the app doesn't crash on simulators / CI where the plist has
+    // not been added to the Xcode target yet.
+    if FirebaseApp.app() == nil,
+       Bundle.main.path(forResource: "GoogleService-Info", ofType: "plist") != nil {
       FirebaseApp.configure()
     }
 
