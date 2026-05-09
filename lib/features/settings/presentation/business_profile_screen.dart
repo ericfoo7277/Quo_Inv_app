@@ -11,6 +11,7 @@ import '../../../core/widgets/premium_screen_header.dart';
 import '../../../core/widgets/primary_button.dart';
 import '../../../core/widgets/responsive_content.dart';
 import '../../../shared/models/business_profile.dart';
+import '../../../shared/models/pdf_template.dart';
 import '../../../shared/providers/business_profile_provider.dart';
 
 const _uuid = Uuid();
@@ -38,6 +39,7 @@ class _BusinessProfileScreenState extends ConsumerState<BusinessProfileScreen> {
   final _invNextCtrl = TextEditingController(text: '1');
   final _timezoneCtrl = TextEditingController(text: 'Asia/Kuala_Lumpur');
   String _currency = 'MYR';
+  PdfTemplate _pdfTemplate = PdfTemplate.classic;
   String? _profileId;
   String? _logoUrl;
   bool _loading = false;
@@ -69,7 +71,10 @@ class _BusinessProfileScreenState extends ConsumerState<BusinessProfileScreen> {
       _quoNextCtrl.text = profile.quotationNextNumber.toString();
       _invNextCtrl.text = profile.invoiceNextNumber.toString();
       _timezoneCtrl.text = profile.timezone;
-      setState(() => _currency = profile.currency);
+      setState(() {
+        _currency = profile.currency;
+        _pdfTemplate = profile.pdfTemplate;
+      });
     }
   }
 
@@ -164,6 +169,7 @@ class _BusinessProfileScreenState extends ConsumerState<BusinessProfileScreen> {
         timezone: _timezoneCtrl.text.trim().isEmpty
             ? 'Asia/Kuala_Lumpur'
             : _timezoneCtrl.text.trim(),
+        pdfTemplate: _pdfTemplate,
       );
       await ref.read(businessProfileRepositoryProvider).save(profile);
       if (mounted) {
@@ -302,6 +308,100 @@ class _BusinessProfileScreenState extends ConsumerState<BusinessProfileScreen> {
                             hint: 'e.g. Asia/Kuala_Lumpur',
                             controller: _timezoneCtrl,
                             prefixIcon: Icons.schedule_outlined,
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: AppSpacing.lg),
+                    // — PDF template picker —
+                    AppCard(
+                      padding: const EdgeInsets.all(AppSpacing.xl),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('PDF template',
+                              style: theme.textTheme.titleSmall),
+                          const SizedBox(height: AppSpacing.sm),
+                          Text(
+                            'Controls how your invoices and quotations look when exported.',
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: theme.colorScheme.onSurface
+                                  .withValues(alpha: 0.6),
+                            ),
+                          ),
+                          const SizedBox(height: AppSpacing.md),
+                          ...PdfTemplate.values.map(
+                            (t) => Padding(
+                              padding: const EdgeInsets.only(
+                                  bottom: AppSpacing.sm),
+                              child: InkWell(
+                                onTap: () =>
+                                    setState(() => _pdfTemplate = t),
+                                borderRadius: BorderRadius.circular(8),
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: AppSpacing.lg,
+                                    vertical: AppSpacing.md,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    border: Border.all(
+                                      color: _pdfTemplate == t
+                                          ? theme.colorScheme.primary
+                                          : theme.colorScheme.outline
+                                              .withValues(alpha: 0.4),
+                                      width: _pdfTemplate == t ? 2 : 1,
+                                    ),
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      Icon(
+                                        _pdfTemplate == t
+                                            ? Icons
+                                                .radio_button_checked_rounded
+                                            : Icons
+                                                .radio_button_unchecked_rounded,
+                                        color: _pdfTemplate == t
+                                            ? theme.colorScheme.primary
+                                            : theme.colorScheme.outline,
+                                        size: 20,
+                                      ),
+                                      const SizedBox(width: AppSpacing.md),
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              t.label,
+                                              style: theme
+                                                  .textTheme.bodyMedium
+                                                  ?.copyWith(
+                                                fontWeight: FontWeight.w600,
+                                                color: _pdfTemplate == t
+                                                    ? theme
+                                                        .colorScheme.primary
+                                                    : null,
+                                              ),
+                                            ),
+                                            Text(
+                                              t.description,
+                                              style: theme
+                                                  .textTheme.bodySmall
+                                                  ?.copyWith(
+                                                color: theme
+                                                    .colorScheme.onSurface
+                                                    .withValues(alpha: 0.6),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
                           ),
                         ],
                       ),

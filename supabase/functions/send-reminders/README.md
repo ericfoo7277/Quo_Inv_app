@@ -100,7 +100,7 @@ cd /Users/peilinfoo/Desktop/my_project/Quo_Inv_app
 
 supabase secrets set FCM_PROJECT_ID=quoswift-1c795
 supabase secrets set CRON_SECRET=17a7d6387b48abe8bf5dcc632d3b8782eee65a006dc039e00dd3cd5f93f834f7
-supabase secrets set FCM_SERVICE_ACCOUNT_JSON="$(cat ~/Downloads/quoswift-1c795-firebase-adminsdk-fbsvc-e65bc0d0a0.json)"
+supabase secrets set FCM_SERVICE_ACCOUNT_JSON="$(cat ~/Downloads/quoswift-1c795-firebase-adminsdk-fbsvc-e5f92ba1b8.json)"
 ```
 
 > The `$(cat …)` trick passes the file contents as a single string. The JSON's

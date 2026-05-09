@@ -19,6 +19,7 @@ import '../../features/quotations/presentation/quotation_form_screen.dart';
 import '../../features/quotations/presentation/quotations_screen.dart';
 import '../../features/reminders/presentation/reminders_screen.dart';
 import '../../features/settings/presentation/business_profile_screen.dart';
+import '../../features/settings/presentation/profile_screen.dart';
 import '../../features/settings/presentation/default_notes_screen.dart';
 import '../../features/settings/presentation/numbering_settings_screen.dart';
 import '../../features/settings/presentation/reminder_settings_screen.dart';
@@ -179,6 +180,12 @@ List<RouteBase> _shellRoutes() => [
         name: RouteNames.settings,
         builder: (_, __) => const SettingsScreen(),
         routes: [
+          GoRoute(
+            path: 'profile',
+            name: RouteNames.profile,
+            parentNavigatorKey: _rootNavigatorKey,
+            builder: (_, __) => const ProfileScreen(),
+          ),
           GoRoute(
             path: 'business-profile',
             name: RouteNames.businessProfile,

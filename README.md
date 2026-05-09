@@ -4,6 +4,8 @@ Build a professional mobile-first app for freelancers, small businesses, and ser
 OLD
 flutter run --dart-define=SUPABASE_URL=https://qtmufapdhghwkugseilg.supabase.co --dart-define=SUPABASE_ANON_KEY=sb_publishable_15zoO05CKAJ5ra4DEjyfOA_-Ys-5DN0
 
+flutter build apk --dart-define=SUPABASE_URL=https://qtmufapdhghwkugseilg.supabase.co --dart-define=SUPABASE_ANON_KEY=sb_publishable_15zoO05CKAJ5ra4DEjyfOA_-Ys-5DN0
+
 
 NEW
 flutter run --dart-define=SUPABASE_URL=https://kmrdomqujnbcewbrbicq.supabase.co --dart-define=SUPABASE_ANON_KEY=sb_publishable_iZcY5DJX1LIyqcW-9F3-YQ_MpOf-D8T

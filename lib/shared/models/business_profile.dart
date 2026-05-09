@@ -1,10 +1,12 @@
+import 'pdf_template.dart';
+
 /// Business profile for a single user / workspace.
 ///
 /// Schema: business_profiles(id, user_id, business_name, phone, email,
 ///   address, logo_url, currency, payment_instructions,
 ///   default_quotation_notes, default_invoice_notes, quotation_prefix,
 ///   invoice_prefix, quotation_next_number, invoice_next_number,
-///   timezone, created_at, updated_at)
+///   timezone, pdf_template, created_at, updated_at)
 class BusinessProfile {
   const BusinessProfile({
     required this.id,
@@ -23,6 +25,7 @@ class BusinessProfile {
     this.quotationNextNumber = 1,
     this.invoiceNextNumber = 1,
     this.timezone = 'Asia/Kuala_Lumpur',
+    this.pdfTemplate = PdfTemplate.classic,
     this.createdAt,
     this.updatedAt,
   });
@@ -67,6 +70,9 @@ class BusinessProfile {
   /// IANA timezone identifier, e.g. "America/New_York".
   final String timezone;
 
+  /// PDF layout template used when generating invoices and quotations.
+  final PdfTemplate pdfTemplate;
+
   final DateTime? createdAt;
   final DateTime? updatedAt;
 
@@ -87,6 +93,7 @@ class BusinessProfile {
     int? quotationNextNumber,
     int? invoiceNextNumber,
     String? timezone,
+    PdfTemplate? pdfTemplate,
     DateTime? createdAt,
     DateTime? updatedAt,
   }) {
@@ -108,6 +115,7 @@ class BusinessProfile {
       quotationNextNumber: quotationNextNumber ?? this.quotationNextNumber,
       invoiceNextNumber: invoiceNextNumber ?? this.invoiceNextNumber,
       timezone: timezone ?? this.timezone,
+      pdfTemplate: pdfTemplate ?? this.pdfTemplate,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
     );

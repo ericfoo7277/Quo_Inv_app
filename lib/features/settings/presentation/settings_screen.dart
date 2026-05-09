@@ -38,7 +38,7 @@ class SettingsScreen extends ConsumerWidget {
                   icon: Icons.person_outline_rounded,
                   title: 'Profile',
                   subtitle: 'Owner account and preferences',
-                  onTap: () {},
+                  onTap: () => context.goNamed(RouteNames.profile),
                 ),
                 const Divider(height: 1),
                 SettingsTile(

@@ -28,6 +28,7 @@ class RouteNames {
 
   static const String payments = 'payments';
   static const String settings = 'settings';
+  static const String profile = 'profile';
 
   static const String reminders = 'reminders';
   static const String businessProfile = 'business-profile';
@@ -65,6 +66,7 @@ class RoutePaths {
 
   static const String payments = '/payments';
   static const String settings = '/settings';
+  static const String profile = '/settings/profile';
 
   static const String reminders = '/reminders';
   static const String businessProfile = '/settings/business-profile';

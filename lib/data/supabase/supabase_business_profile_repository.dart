@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../shared/models/business_profile.dart';
+import '../../shared/models/pdf_template.dart';
 import '../repositories/business_profile_repository.dart';
 
 class SupabaseBusinessProfileRepository implements BusinessProfileRepository {
@@ -90,6 +91,7 @@ class SupabaseBusinessProfileRepository implements BusinessProfileRepository {
         'quotation_next_number': p.quotationNextNumber,
         'invoice_next_number': p.invoiceNextNumber,
         'timezone': p.timezone,
+        'pdf_template': p.pdfTemplate.name,
         'updated_at': DateTime.now().toUtc().toIso8601String(),
       };
 
@@ -110,6 +112,7 @@ class SupabaseBusinessProfileRepository implements BusinessProfileRepository {
         quotationNextNumber: m['quotation_next_number'] as int? ?? 1,
         invoiceNextNumber: m['invoice_next_number'] as int? ?? 1,
         timezone: m['timezone'] as String? ?? 'Asia/Kuala_Lumpur',
+        pdfTemplate: PdfTemplate.fromString(m['pdf_template'] as String?),
         createdAt: DateTime.tryParse(m['created_at'] as String? ?? ''),
         updatedAt: DateTime.tryParse(m['updated_at'] as String? ?? ''),
       );
