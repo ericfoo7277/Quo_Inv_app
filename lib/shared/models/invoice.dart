@@ -97,7 +97,8 @@ class Invoice {
     this.amountPaid = 0,
     this.notes,
     this.paymentInstructions,
-    this.currency = 'USD',
+    this.currency = 'MYR',
+    this.storedTotal,
     this.createdAt,
     this.updatedAt,
   });
@@ -136,6 +137,10 @@ class Invoice {
   final String? notes;
   final String? paymentInstructions;
   final String currency;
+
+  /// Pre-computed total from the DB, used when [items] is empty (e.g. list views).
+  final double? storedTotal;
+
   final DateTime? createdAt;
   final DateTime? updatedAt;
 
@@ -143,10 +148,10 @@ class Invoice {
   double get taxAmount => (subtotal - discountAmount) * taxRate;
   double get totalAmount => subtotal - discountAmount + taxAmount;
 
-  /// Alias kept for backward compatibility.
-  double get total => totalAmount;
+  /// Returns the DB-cached total when items are not loaded, otherwise computes.
+  double get total => items.isEmpty && storedTotal != null ? storedTotal! : totalAmount;
 
-  double get balanceDue => (totalAmount - amountPaid).clamp(0, double.infinity);
+  double get balanceDue => (total - amountPaid).clamp(0, double.infinity);
 
   Invoice copyWith({
     String? id,
@@ -165,6 +170,7 @@ class Invoice {
     String? notes,
     String? paymentInstructions,
     String? currency,
+    double? storedTotal,
     DateTime? createdAt,
     DateTime? updatedAt,
   }) {
@@ -185,6 +191,7 @@ class Invoice {
       notes: notes ?? this.notes,
       paymentInstructions: paymentInstructions ?? this.paymentInstructions,
       currency: currency ?? this.currency,
+      storedTotal: storedTotal ?? this.storedTotal,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
     );

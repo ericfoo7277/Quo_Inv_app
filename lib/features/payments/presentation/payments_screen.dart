@@ -9,7 +9,9 @@ import '../../../core/widgets/empty_state.dart';
 import '../../../core/widgets/premium_screen_header.dart';
 import '../../../core/widgets/responsive_content.dart';
 import '../../../shared/models/payment.dart';
+import '../../../shared/providers/business_profile_provider.dart';
 import '../../../shared/providers/payments_provider.dart';
+import '../../../shared/utils/currency_format.dart';
 
 class PaymentsScreen extends ConsumerWidget {
   const PaymentsScreen({super.key});
@@ -18,7 +20,8 @@ class PaymentsScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final payments = ref.watch(paymentsProvider);
-    final currency = NumberFormat.simpleCurrency();
+    final businessCurrency = ref.watch(businessProfileProvider).value?.currency;
+    final currency = AppCurrencyFormat.formatter(businessCurrency);
     final dateFmt = DateFormat.yMMMd();
 
     return Scaffold(

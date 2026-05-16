@@ -8,6 +8,7 @@ import '../../../shared/models/business_profile.dart';
 import '../../../shared/models/invoice.dart';
 import '../../../shared/models/pdf_template.dart';
 import '../../../shared/models/quotation.dart';
+import '../../../shared/utils/currency_format.dart';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Shared colours used across templates
@@ -31,7 +32,9 @@ class DocumentPdfService {
     required BusinessProfile? business,
   }) async {
     final dateFmt = DateFormat.yMMMd();
-    final currency = NumberFormat.simpleCurrency(name: invoice.currency);
+    final currency = AppCurrencyFormat.formatter(
+      business?.currency ?? invoice.currency,
+    );
     final params = _DocParams(
       title: 'INVOICE',
       number: invoice.invoiceNumber,
@@ -72,7 +75,9 @@ class DocumentPdfService {
     required BusinessProfile? business,
   }) async {
     final dateFmt = DateFormat.yMMMd();
-    final currency = NumberFormat.simpleCurrency(name: quotation.currency);
+    final currency = AppCurrencyFormat.formatter(
+      business?.currency ?? quotation.currency,
+    );
     final params = _DocParams(
       title: 'QUOTATION',
       number: quotation.quotationNumber,

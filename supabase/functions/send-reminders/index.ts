@@ -31,11 +31,12 @@ interface InvoiceRow {
      id: string;
      user_id: string;
      invoice_number: string;
-     customer_name: string;
-     total: number;
+     total_amount: number;
+     balance_due: number | null;
      currency: string;
      due_date: string; // YYYY-MM-DD
      status: string;
+     customers: { name: string | null } | { name: string | null }[] | null;
 }
 
 interface DeviceRow {
@@ -177,17 +178,28 @@ function renderTemplate(
 ): { title: string; body: string } {
      const fmt = new Intl.NumberFormat("en", {
           style: "currency",
-          currency: inv.currency || "USD",
+          currency: inv.currency || "MYR",
      });
+     const customer = Array.isArray(inv.customers)
+          ? inv.customers[0]
+          : inv.customers;
+     const customerName = customer?.name || "customer";
+     const amount = inv.balance_due && inv.balance_due > 0
+          ? inv.balance_due
+          : inv.total_amount;
      const status = diff > 0
           ? `due in ${diff} days`
           : diff === 0
                ? "due today"
                : `${Math.abs(diff)} days overdue`;
-     const body = (tpl || "Invoice {{number}} for {{customer}} is {{status}}.")
+     const body = (tpl || "Hi {customer}, this is a friendly reminder that invoice {invoice} for {amount} is due on {due_date}. Thank you!")
+          .replaceAll("{invoice}", inv.invoice_number)
+          .replaceAll("{customer}", customerName)
+          .replaceAll("{amount}", fmt.format(amount))
+          .replaceAll("{due_date}", inv.due_date)
           .replaceAll("{{number}}", inv.invoice_number)
-          .replaceAll("{{customer}}", inv.customer_name)
-          .replaceAll("{{amount}}", fmt.format(inv.total))
+          .replaceAll("{{customer}}", customerName)
+          .replaceAll("{{amount}}", fmt.format(amount))
           .replaceAll("{{status}}", status);
      return {
           title: diff < 0
@@ -270,10 +282,10 @@ Deno.serve(async (req) => {
           const { data: invoices, error: invErr } = await supa
                .from("invoices")
                .select(
-                    "id, user_id, invoice_number, customer_name, total, currency, due_date, status",
+                    "id, user_id, invoice_number, total_amount, balance_due, currency, due_date, status, customers(name)",
                )
                .eq("user_id", s.user_id)
-               .in("status", ["sent", "partial", "overdue"])
+               .in("status", ["sent", "partially_paid"])
                .in("due_date", candidates.map((c) => c.date));
 
           if (invErr) {

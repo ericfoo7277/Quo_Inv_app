@@ -13,6 +13,8 @@ import '../../../shared/models/invoice.dart';
 import '../../../shared/providers/customers_provider.dart';
 import '../../../shared/providers/invoices_provider.dart';
 import '../../../shared/providers/repository_providers.dart';
+import '../../../shared/providers/business_profile_provider.dart';
+import '../../../shared/utils/currency_format.dart';
 
 const _uuid = Uuid();
 
@@ -151,12 +153,14 @@ class _InvoiceFormScreenState extends ConsumerState<InvoiceFormScreen> {
         paymentInstructions: _paymentInstructionsCtrl.text.trim().isEmpty
             ? null
             : _paymentInstructionsCtrl.text.trim(),
+        currency: ref.read(businessProfileProvider).value?.currency ?? 'MYR',
       );
       if (_isEdit) {
         await repo.update(invoice);
       } else {
         await repo.create(invoice);
       }
+      ref.invalidate(invoicesProvider);
       if (mounted) Navigator.of(context).pop();
     } catch (e) {
       if (mounted) {
@@ -178,6 +182,7 @@ class _InvoiceFormScreenState extends ConsumerState<InvoiceFormScreen> {
     }
 
     final customersAsync = ref.watch(customersProvider);
+  final businessCurrency = ref.watch(businessProfileProvider).value?.currency;
 
     return Scaffold(
       appBar: AppBar(title: Text(_isEdit ? 'Edit Invoice' : 'New Invoice')),
@@ -353,19 +358,33 @@ class _InvoiceFormScreenState extends ConsumerState<InvoiceFormScreen> {
                   padding: const EdgeInsets.all(AppSpacing.xl),
                   child: Column(
                     children: [
-                      _TotalRow(label: 'Subtotal', amount: _subtotal),
+                      _TotalRow(
+                        label: 'Subtotal',
+                        amount: _subtotal,
+                        currency: businessCurrency,
+                      ),
                       if (_discount > 0) ...[
                         const SizedBox(height: AppSpacing.sm),
-                        _TotalRow(label: 'Discount', amount: -_discount),
+                        _TotalRow(
+                          label: 'Discount',
+                          amount: -_discount,
+                          currency: businessCurrency,
+                        ),
                       ],
                       const SizedBox(height: AppSpacing.sm),
                       _TotalRow(
                         label:
                             'Tax (${(double.tryParse(_taxRateCtrl.text) ?? 0).toStringAsFixed(1)}%)',
                         amount: _taxAmount,
+                        currency: businessCurrency,
                       ),
                       const Divider(height: AppSpacing.xxl),
-                      _TotalRow(label: 'Total', amount: _total, isTotal: true),
+                      _TotalRow(
+                        label: 'Total',
+                        amount: _total,
+                        currency: businessCurrency,
+                        isTotal: true,
+                      ),
                     ],
                   ),
                 ),
@@ -469,9 +488,10 @@ class _LineItemRowState extends State<_LineItemRow> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Expanded(
-            flex: 4,
+            flex: 3,
             child: AppTextField(
-              hint: 'Item name',
+              label: 'Item name',
+              hint: 'e.g. Web design',
               controller: _descCtrl,
               onChanged: (v) {
                 widget.item.itemName = v;
@@ -481,8 +501,10 @@ class _LineItemRowState extends State<_LineItemRow> {
           ),
           const SizedBox(width: AppSpacing.sm),
           Expanded(
+            flex: 2,
             child: AppTextField(
-              hint: 'Qty',
+              label: 'Qty',
+              hint: '1',
               controller: _qtyCtrl,
               keyboardType:
                   const TextInputType.numberWithOptions(decimal: true),
@@ -496,7 +518,8 @@ class _LineItemRowState extends State<_LineItemRow> {
           Expanded(
             flex: 2,
             child: AppTextField(
-              hint: 'Price',
+              label: 'Unit price',
+              hint: '0.00',
               controller: _priceCtrl,
               keyboardType:
                   const TextInputType.numberWithOptions(decimal: true),
@@ -521,11 +544,13 @@ class _TotalRow extends StatelessWidget {
   const _TotalRow({
     required this.label,
     required this.amount,
+    required this.currency,
     this.isTotal = false,
   });
 
   final String label;
   final double amount;
+  final String? currency;
   final bool isTotal;
 
   @override
@@ -538,7 +563,7 @@ class _TotalRow extends StatelessWidget {
       children: [
         Text(label, style: style),
         Text(
-          NumberFormat.simpleCurrency().format(amount),
+          AppCurrencyFormat.format(amount, currency: currency),
           style: style?.copyWith(fontWeight: FontWeight.w600),
         ),
       ],

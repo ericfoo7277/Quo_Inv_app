@@ -13,7 +13,9 @@ import '../../../core/widgets/premium_screen_header.dart';
 import '../../../core/widgets/responsive_content.dart';
 import '../../../core/widgets/skeleton_list.dart';
 import '../../../shared/models/invoice.dart';
+import '../../../shared/providers/business_profile_provider.dart';
 import '../../../shared/providers/invoices_provider.dart';
+import '../../../shared/utils/currency_format.dart';
 
 class InvoicesScreen extends ConsumerWidget {
   const InvoicesScreen({super.key});
@@ -21,6 +23,7 @@ class InvoicesScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final invoices = ref.watch(invoicesProvider);
+    final businessCurrency = ref.watch(businessProfileProvider).value?.currency;
     final dateFmt = DateFormat.yMMMd();
 
     return Scaffold(
@@ -64,8 +67,9 @@ class InvoicesScreen extends ConsumerWidget {
                   );
                 }
                 final inv = sorted[i - 1];
-                final currency =
-                    NumberFormat.simpleCurrency(name: inv.currency);
+                final currency = AppCurrencyFormat.formatter(
+                  businessCurrency ?? inv.currency,
+                );
                 return ResponsiveContent(
                   child: Padding(
                     padding: const EdgeInsets.only(bottom: AppSpacing.md),

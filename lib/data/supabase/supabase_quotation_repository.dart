@@ -306,6 +306,7 @@ class SupabaseQuotationRepository implements QuotationRepository {
       paymentInstructions: m['payment_instructions'] as String?,
       convertedInvoiceId: m['converted_invoice_id'] as String?,
       currency: (m['currency'] as String?) ?? 'MYR',
+      storedTotal: items.isEmpty ? (m['total_amount'] as num?)?.toDouble() : null,
       createdAt: DateTime.tryParse(m['created_at'] as String? ?? ''),
       updatedAt: DateTime.tryParse(m['updated_at'] as String? ?? ''),
     );

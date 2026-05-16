@@ -15,9 +15,11 @@ import '../../../core/widgets/section_header.dart';
 import '../../../core/widgets/status_pill.dart';
 import '../../../shared/models/invoice.dart';
 import '../../../shared/models/reminder_setting.dart';
+import '../../../shared/providers/business_profile_provider.dart';
 import '../../../shared/providers/customers_provider.dart';
 import '../../../shared/providers/invoices_provider.dart';
 import '../../../shared/providers/reminder_setting_provider.dart';
+import '../../../shared/utils/currency_format.dart';
 import '../../documents/services/document_share_service.dart';
 
 String _plural(int n, String word) => '$n $word${n == 1 ? '' : 's'}';
@@ -45,16 +47,14 @@ class RemindersScreen extends ConsumerWidget {
 
           final overdue = invoices
               .where((i) =>
-                  i.status != InvoiceStatus.paid &&
-                  i.status != InvoiceStatus.cancelled &&
+                _shouldRemind(i) &&
                   i.dueDate.isBefore(today))
               .toList()
             ..sort((a, b) => a.dueDate.compareTo(b.dueDate));
 
           final dueSoon = invoices
               .where((i) =>
-                  i.status != InvoiceStatus.paid &&
-                  i.status != InvoiceStatus.cancelled &&
+                _shouldRemind(i) &&
                   !i.dueDate.isBefore(today) &&
                   i.dueDate.isBefore(
                       today.add(Duration(days: remindBeforeDays + 1))))
@@ -142,7 +142,10 @@ class _ReminderCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
-    final currency = NumberFormat.simpleCurrency(name: invoice.currency);
+    final businessCurrency = ref.watch(businessProfileProvider).value?.currency;
+    final currency = AppCurrencyFormat.formatter(
+      businessCurrency ?? invoice.currency,
+    );
     final diff = invoice.dueDate.difference(today).inDays;
     final daysLabel = isOverdue
         ? '${_plural(diff.abs(), 'day')} overdue'
@@ -186,7 +189,7 @@ class _ReminderCard extends ConsumerWidget {
                 ),
               ),
               Text(
-                currency.format(invoice.total),
+                currency.format(invoice.balanceDue),
                 style: theme.textTheme.titleMedium
                     ?.copyWith(fontWeight: FontWeight.w700),
               ),
@@ -236,9 +239,10 @@ class _ReminderCard extends ConsumerWidget {
           data: (s) => s.messageTemplate,
           orElse: () => ReminderSetting.defaultMessageTemplate,
         );
-    final amount =
-        NumberFormat.simpleCurrency(name: invoice.currency).format(
+    final amount = AppCurrencyFormat.format(
       invoice.balanceDue > 0 ? invoice.balanceDue : invoice.total,
+      currency:
+          ref.read(businessProfileProvider).value?.currency ?? invoice.currency,
     );
     return tpl
         .replaceAll('{customer}', invoice.customerName)
@@ -275,4 +279,10 @@ class _ReminderCard extends ConsumerWidget {
       ),
     );
   }
+}
+
+bool _shouldRemind(Invoice invoice) {
+  return invoice.status == InvoiceStatus.sent ||
+      invoice.status == InvoiceStatus.partiallyPaid ||
+      invoice.status == InvoiceStatus.overdue;
 }

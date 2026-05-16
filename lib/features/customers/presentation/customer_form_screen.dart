@@ -87,6 +87,9 @@ class _CustomerFormScreenState extends ConsumerState<CustomerFormScreen> {
       } else {
         await repo.create(customer);
       }
+      // Invalidate so the list refreshes immediately, regardless of whether
+      // the Supabase Realtime stream delivers the change in time.
+      ref.invalidate(customersProvider);
       if (mounted) Navigator.of(context).pop();
     } catch (e) {
       if (mounted) {

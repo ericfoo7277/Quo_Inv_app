@@ -11,10 +11,15 @@ import '../../../core/widgets/empty_state.dart';
 import '../../../core/widgets/premium_screen_header.dart';
 import '../../../core/widgets/primary_button.dart';
 import '../../../core/widgets/responsive_content.dart';
+import '../../../core/widgets/secondary_button.dart';
 import '../../../core/router/route_names.dart';
 import '../../../shared/models/invoice.dart';
+import '../../../shared/models/business_profile.dart';
+import '../../../shared/providers/business_profile_provider.dart';
 import '../../../shared/providers/invoices_provider.dart';
+import '../../../shared/providers/payments_provider.dart';
 import '../../../shared/providers/repository_providers.dart';
+import '../../../shared/utils/currency_format.dart';
 import '../../documents/presentation/widgets/document_actions_menu.dart';
 import '../../documents/presentation/widgets/document_header_card.dart';
 import '../../documents/presentation/widgets/document_totals_card.dart';
@@ -29,6 +34,7 @@ class InvoiceDetailScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final invoiceAsync = ref.watch(invoiceByIdProvider(id));
+    final business = ref.watch(businessProfileProvider).value;
     final dateFmt = DateFormat.yMMMd();
 
     final appBarTitle = invoiceAsync.maybeWhen(
@@ -45,6 +51,7 @@ class InvoiceDetailScreen extends ConsumerWidget {
           if (invoiceAsync.value != null)
             DocumentActionsMenu(
               invoice: invoiceAsync.value!,
+              business: business,
               onDuplicate: () => _duplicate(context, ref, invoiceAsync.value!),
             ),
         ],
@@ -57,7 +64,9 @@ class InvoiceDetailScreen extends ConsumerWidget {
             return const EmptyState(
                 title: 'Invoice not found', icon: Icons.error_outline);
           }
-          final currency = NumberFormat.simpleCurrency(name: inv.currency);
+          final currency = AppCurrencyFormat.formatter(
+            business?.currency ?? inv.currency,
+          );
           return ListView(
             padding: const EdgeInsets.all(AppSpacing.screenPadding),
             children: [
@@ -98,20 +107,23 @@ class InvoiceDetailScreen extends ConsumerWidget {
               if (inv.notes != null) ...[
                 const SizedBox(height: AppSpacing.lg),
                 ResponsiveContent(
-                  child: AppCard(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text('Notes', style: theme.textTheme.titleSmall),
-                        const SizedBox(height: AppSpacing.xs),
-                        Text(inv.notes!, style: theme.textTheme.bodyMedium),
-                      ],
+                  child: SizedBox(
+                    width: double.infinity,
+                    child: AppCard(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('Notes', style: theme.textTheme.titleSmall),
+                          const SizedBox(height: AppSpacing.xs),
+                          Text(inv.notes!, style: theme.textTheme.bodyMedium),
+                        ],
+                      ),
                     ),
                   ),
                 ),
               ],
               const SizedBox(height: AppSpacing.xxl),
-              _ActionSection(invoice: inv),
+              _ActionSection(invoice: inv, business: business),
             ],
           );
         },
@@ -155,9 +167,10 @@ class InvoiceDetailScreen extends ConsumerWidget {
 }
 
 class _ActionSection extends ConsumerStatefulWidget {
-  const _ActionSection({required this.invoice});
+  const _ActionSection({required this.invoice, required this.business});
 
   final Invoice invoice;
+  final BusinessProfile? business;
 
   @override
   ConsumerState<_ActionSection> createState() => _ActionSectionState();
@@ -209,13 +222,30 @@ class _ActionSectionState extends ConsumerState<_ActionSection> {
     }
 
     if (invoice.status == InvoiceStatus.draft) {
-      return ResponsiveContent(
-        child: PrimaryButton(
-          label: 'Mark as sent',
-          icon: Icons.send_rounded,
-          isLoading: _marking,
-          onPressed: _marking ? null : _markAsSent,
-        ),
+      return Column(
+        children: [
+          ResponsiveContent(
+            child: PrimaryButton(
+              label: 'Mark as sent',
+              icon: Icons.send_rounded,
+              isLoading: _marking,
+              onPressed: _marking ? null : _markAsSent,
+            ),
+          ),
+          const SizedBox(height: AppSpacing.md),
+          ResponsiveContent(
+            child: SecondaryButton(
+              label: 'Send to customer',
+              icon: Icons.ios_share_rounded,
+              onPressed: () => DocumentActionsMenu.showSendSheet(
+                context,
+                ref,
+                invoice: invoice,
+                business: widget.business,
+              ),
+            ),
+          ),
+        ],
       );
     }
 
@@ -228,13 +258,20 @@ class _ActionSectionState extends ConsumerState<_ActionSection> {
       child: PrimaryButton(
         label: 'Record payment',
         icon: Icons.payments_rounded,
-        onPressed: () => showRecordPaymentDialog(
-          context,
-          invoiceId: invoice.id,
-          invoiceNumber: invoice.invoiceNumber,
-          customerName: invoice.customerName,
-          maxAmount: invoice.balanceDue,
-        ),
+        onPressed: () async {
+          final recorded = await showRecordPaymentDialog(
+            context,
+            invoiceId: invoice.id,
+            invoiceNumber: invoice.invoiceNumber,
+            customerName: invoice.customerName,
+            maxAmount: invoice.balanceDue,
+          );
+          if (recorded == true) {
+            ref.invalidate(invoiceByIdProvider(invoice.id));
+            ref.invalidate(invoicesProvider);
+            ref.invalidate(paymentsProvider);
+          }
+        },
       ),
     );
   }

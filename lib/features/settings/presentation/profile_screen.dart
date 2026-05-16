@@ -42,7 +42,7 @@ class ProfileScreen extends ConsumerWidget {
                     CircleAvatar(
                       radius: 28,
                       backgroundColor:
-                          theme.colorScheme.primary.withOpacity(0.12),
+                          theme.colorScheme.primary.withValues(alpha: 0.12),
                       child: Text(
                         _initials(displayName.isNotEmpty ? displayName : email),
                         style: theme.textTheme.titleMedium?.copyWith(
@@ -67,7 +67,7 @@ class ProfileScreen extends ConsumerWidget {
                             email,
                             style: theme.textTheme.bodyMedium?.copyWith(
                               color: theme.colorScheme.onSurface
-                                  .withOpacity(0.65),
+                                  .withValues(alpha: 0.65),
                             ),
                           ),
                         ],

@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
 import '../../../core/constants/app_spacing.dart';
+import '../../../core/widgets/app_card.dart';
 import '../../../core/widgets/async_value_view.dart';
 import '../../../core/widgets/empty_state.dart';
 import '../../../core/widgets/premium_screen_header.dart';
@@ -12,8 +13,10 @@ import '../../../core/widgets/responsive_content.dart';
 import '../../../core/widgets/secondary_button.dart';
 import '../../../core/router/route_names.dart';
 import '../../../shared/models/quotation.dart';
+import '../../../shared/providers/business_profile_provider.dart';
 import '../../../shared/providers/quotations_provider.dart';
 import '../../../shared/providers/repository_providers.dart';
+import '../../../shared/utils/currency_format.dart';
 import '../../documents/presentation/widgets/document_actions_menu.dart';
 import '../../documents/presentation/widgets/document_header_card.dart';
 import '../../documents/presentation/widgets/document_totals_card.dart';
@@ -25,7 +28,9 @@ class QuotationDetailScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
     final quoteAsync = ref.watch(quotationByIdProvider(id));
+    final business = ref.watch(businessProfileProvider).value;
     final dateFmt = DateFormat.yMMMd();
     final appBarTitle = quoteAsync.maybeWhen(
       data: (q) => q == null
@@ -41,6 +46,7 @@ class QuotationDetailScreen extends ConsumerWidget {
           if (quoteAsync.value != null)
             DocumentActionsMenu.quotation(
               quotation: quoteAsync.value!,
+              business: business,
               onDuplicate: () => _duplicate(context, ref, quoteAsync.value!),
             ),
         ],
@@ -53,7 +59,9 @@ class QuotationDetailScreen extends ConsumerWidget {
             return const EmptyState(
                 title: 'Quotation not found', icon: Icons.error_outline);
           }
-          final currency = NumberFormat.simpleCurrency(name: q.currency);
+          final currency = AppCurrencyFormat.formatter(
+            business?.currency ?? q.currency,
+          );
           return ListView(
             padding: const EdgeInsets.all(AppSpacing.screenPadding),
             children: [
@@ -85,6 +93,38 @@ class QuotationDetailScreen extends ConsumerWidget {
                   total: q.total,
                 ),
               ),
+              if (q.notes != null || q.paymentInstructions != null) ...[
+                const SizedBox(height: AppSpacing.lg),
+                ResponsiveContent(
+                  child: SizedBox(
+                    width: double.infinity,
+                    child: AppCard(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          if (q.notes != null) ...[
+                            Text('Notes', style: theme.textTheme.titleSmall),
+                            const SizedBox(height: AppSpacing.xs),
+                            Text(q.notes!, style: theme.textTheme.bodyMedium),
+                          ],
+                          if (q.notes != null &&
+                              q.paymentInstructions != null)
+                            const SizedBox(height: AppSpacing.lg),
+                          if (q.paymentInstructions != null) ...[
+                            Text('Payment instructions',
+                                style: theme.textTheme.titleSmall),
+                            const SizedBox(height: AppSpacing.xs),
+                            Text(
+                              q.paymentInstructions!,
+                              style: theme.textTheme.bodyMedium,
+                            ),
+                          ],
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ],
               const SizedBox(height: AppSpacing.xxl),
               ResponsiveContent(
                 child: PrimaryButton(
@@ -113,7 +153,12 @@ class QuotationDetailScreen extends ConsumerWidget {
                 child: SecondaryButton(
                   label: 'Send to customer',
                   icon: Icons.send_rounded,
-                  onPressed: () {},
+                  onPressed: () => DocumentActionsMenu.showSendSheet(
+                    context,
+                    ref,
+                    quotation: q,
+                    business: business,
+                  ),
                 ),
               ),
             ],

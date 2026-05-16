@@ -19,6 +19,7 @@ class LocalNotificationService {
   final FlutterLocalNotificationsPlugin _plugin =
       FlutterLocalNotificationsPlugin();
   bool _initialized = false;
+  String? _lastScheduleSignature;
 
   Future<void> init() async {
     if (_initialized) return;
@@ -57,6 +58,11 @@ class LocalNotificationService {
     required ReminderSetting setting,
   }) async {
     if (!_initialized) await init();
+
+    final signature = _scheduleSignature(invoices: invoices, setting: setting);
+    if (_lastScheduleSignature == signature) return;
+    _lastScheduleSignature = signature;
+
     if (!setting.enableLocalNotifications) {
       await _plugin.cancelAll();
       return;
@@ -78,8 +84,7 @@ class LocalNotificationService {
     final now = DateTime.now();
     var scheduled = 0;
     for (final inv in invoices) {
-      if (inv.status == InvoiceStatus.paid ||
-          inv.status == InvoiceStatus.cancelled) {
+      if (!_shouldRemind(inv)) {
         continue;
       }
 
@@ -89,7 +94,7 @@ class LocalNotificationService {
       // Reminder N days BEFORE due date.
       final beforeAt =
           dueDate.subtract(Duration(days: setting.remindBeforeDays));
-      if (beforeAt.isAfter(now)) {
+      if (setting.remindBeforeDays > 0 && beforeAt.isAfter(now)) {
         await _schedule(
           id: _idFor(inv.id, 'before'),
           when: beforeAt,
@@ -162,6 +167,37 @@ class LocalNotificationService {
   int _idFor(String invoiceId, String phase) {
     final raw = '$invoiceId|$phase'.hashCode;
     return raw & 0x7fffffff;
+  }
+
+  bool _shouldRemind(Invoice invoice) {
+    return invoice.status == InvoiceStatus.sent ||
+        invoice.status == InvoiceStatus.partiallyPaid ||
+        invoice.status == InvoiceStatus.overdue;
+  }
+
+  String _scheduleSignature({
+    required List<Invoice> invoices,
+    required ReminderSetting setting,
+  }) {
+    final invoiceParts = [...invoices]
+      ..sort((a, b) => a.id.compareTo(b.id));
+
+    return [
+      setting.enableLocalNotifications,
+      setting.remindBeforeDays,
+      setting.remindOnDueDate,
+      setting.remindAfterDays,
+      for (final inv in invoiceParts)
+        [
+          inv.id,
+          inv.invoiceNumber,
+          inv.customerName,
+          inv.status.name,
+          inv.dueDate.toIso8601String(),
+          inv.amountPaid,
+          inv.storedTotal ?? inv.total,
+        ].join(':'),
+    ].join('|');
   }
 
   Future<void> cancelAll() => _plugin.cancelAll();

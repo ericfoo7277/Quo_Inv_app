@@ -66,9 +66,9 @@ class _ReminderSettingsScreenState
     try {
       final setting = ReminderSetting(
         id: _settingId ?? '',
-        remindBeforeDays: int.tryParse(_beforeCtrl.text) ?? 3,
+        remindBeforeDays: _nonNegativeInt(_beforeCtrl.text, fallback: 3),
         remindOnDueDate: _remindOnDueDate,
-        remindAfterDays: int.tryParse(_afterCtrl.text) ?? 1,
+        remindAfterDays: _nonNegativeInt(_afterCtrl.text, fallback: 1),
         enablePushNotifications: _enablePush,
         enableLocalNotifications: _enableLocal,
         messageTemplate: _templateCtrl.text.trim().isEmpty
@@ -78,6 +78,7 @@ class _ReminderSettingsScreenState
       final saved =
           await ref.read(reminderSettingRepositoryProvider).save(setting);
       _settingId = saved.id;
+        ref.invalidate(reminderSettingProvider);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Reminder settings saved!')));
@@ -91,6 +92,11 @@ class _ReminderSettingsScreenState
     } finally {
       if (mounted) setState(() => _loading = false);
     }
+  }
+
+  int _nonNegativeInt(String value, {required int fallback}) {
+    final parsed = int.tryParse(value.trim()) ?? fallback;
+    return parsed < 0 ? 0 : parsed;
   }
 
   @override

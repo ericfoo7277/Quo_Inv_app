@@ -15,10 +15,12 @@ import '../../../core/widgets/responsive_content.dart';
 import '../../../core/widgets/section_header.dart';
 import '../../../shared/models/invoice.dart';
 import '../../../shared/models/quotation.dart';
+import '../../../shared/providers/business_profile_provider.dart';
 import '../../../shared/providers/invoices_provider.dart';
 import '../../../shared/providers/payments_provider.dart';
 import '../../../shared/providers/quotations_provider.dart';
 import '../../../shared/providers/reminder_setting_provider.dart';
+import '../../../shared/utils/currency_format.dart';
 import 'widgets/dashboard_balance_hero.dart';
 
 class DashboardScreen extends ConsumerWidget {
@@ -29,11 +31,12 @@ class DashboardScreen extends ConsumerWidget {
     final invoicesAsync = ref.watch(invoicesProvider);
     final quotationsAsync = ref.watch(quotationsProvider);
     final paymentsAsync = ref.watch(paymentsProvider);
+    final businessCurrency = ref.watch(businessProfileProvider).value?.currency;
     final remindBeforeDays = ref
         .watch(reminderSettingProvider)
         .maybeWhen(data: (s) => s.remindBeforeDays, orElse: () => 7);
 
-    final currency = NumberFormat.simpleCurrency();
+    final currency = AppCurrencyFormat.formatter(businessCurrency);
     final invoices = invoicesAsync.value ?? const <Invoice>[];
     final quotations = quotationsAsync.value ?? const <Quotation>[];
     final payments = paymentsAsync.value ?? const [];
@@ -100,23 +103,6 @@ class DashboardScreen extends ConsumerWidget {
               title: 'Dashboard',
               subtitle: 'QuoSwift keeps your quotes and invoices moving.',
               icon: Icons.auto_graph_rounded,
-              trailing: Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppSpacing.md,
-                  vertical: AppSpacing.sm,
-                ),
-                decoration: BoxDecoration(
-                  color: AppColors.primary.withValues(alpha: 0.10),
-                  borderRadius: BorderRadius.circular(999),
-                ),
-                child: Text(
-                  'QuoSwift',
-                  style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                        color: AppColors.primary,
-                        fontWeight: FontWeight.w700,
-                      ),
-                ),
-              ),
             ),
             const SizedBox(height: AppSpacing.xxl),
 
@@ -145,7 +131,7 @@ class DashboardScreen extends ConsumerWidget {
                     onTap: () => context.goNamed(RouteNames.reminders),
                   );
                   final dueSoonCard = MetricCard(
-                    label: 'Due in $remindBeforeDays days',
+                    label: 'Due within $remindBeforeDays days',
                     value: dueSoonCount.toString(),
                     icon: Icons.schedule_rounded,
                     color: AppColors.warning,
@@ -272,7 +258,9 @@ class DashboardScreen extends ConsumerWidget {
               ...recentInvoices.take(4).toList().asMap().entries.map((entry) {
                 final index = entry.key;
                 final inv = entry.value;
-                final fmt = NumberFormat.simpleCurrency(name: inv.currency);
+                final fmt = AppCurrencyFormat.formatter(
+                  businessCurrency ?? inv.currency,
+                );
                 return ResponsiveContent(
                   child: Padding(
                     padding: const EdgeInsets.only(bottom: AppSpacing.md),
@@ -332,7 +320,9 @@ class DashboardScreen extends ConsumerWidget {
                   .map((entry) {
                 final index = entry.key;
                 final q = entry.value;
-                final fmt = NumberFormat.simpleCurrency(name: q.currency);
+                final fmt = AppCurrencyFormat.formatter(
+                  businessCurrency ?? q.currency,
+                );
                 return ResponsiveContent(
                   child: Padding(
                     padding: const EdgeInsets.only(bottom: AppSpacing.md),

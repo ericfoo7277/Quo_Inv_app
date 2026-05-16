@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../shared/providers/notification_sync_provider.dart';
 import '../constants/app_spacing.dart';
 import '../router/route_names.dart';
 
@@ -52,9 +51,6 @@ class AppShell extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // Keep local notifications in sync with invoices/settings.
-    ref.watch(notificationSyncProvider);
-
     final createRouteName = switch (_currentIndex) {
       1 => RouteNames.invoiceForm,
       2 => RouteNames.quotationForm,

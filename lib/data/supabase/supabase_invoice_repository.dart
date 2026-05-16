@@ -21,6 +21,7 @@ class SupabaseInvoiceRepository implements InvoiceRepository {
   static const _invoices = 'invoices';
   static const _items = 'invoice_items';
   static const _profiles = 'business_profiles';
+  static const _customers = 'customers';
 
   String get _uid {
     final user = _client.auth.currentUser;
@@ -90,10 +91,36 @@ class SupabaseInvoiceRepository implements InvoiceRepository {
         .stream(primaryKey: ['id'])
         .eq('user_id', _uid)
         .order('issue_date', ascending: false)
-        .map((rows) => rows
-            .map((r) => _fromMap(Map<String, dynamic>.from(r), items: const []))
-            .toList(growable: false));
+        .asyncMap((rows) async {
+      final maps = rows.map((r) => Map<String, dynamic>.from(r)).toList();
+      final customerNames = await _customerNamesById(
+        maps.map((m) => m['customer_id'] as String).toSet(),
+      );
+
+      return maps.map((m) {
+        final customerName = customerNames[m['customer_id'] as String];
+        if (customerName != null) {
+          m['customers'] = {'name': customerName};
+        }
+        return _fromMap(m, items: const []);
+      }).toList(growable: false);
+    });
   }
+
+      Future<Map<String, String>> _customerNamesById(Set<String> ids) async {
+        if (ids.isEmpty) return const {};
+
+        final rows = await _client
+            .from(_customers)
+            .select('id, name')
+            .eq('user_id', _uid)
+            .inFilter('id', ids.toList()) as List<dynamic>;
+
+        return {
+          for (final row in rows)
+            (row as Map)['id'] as String: (row['name'] as String?) ?? '',
+        };
+      }
 
   // ---------------------------------------------------------------------------
   // Writes
@@ -276,6 +303,7 @@ class SupabaseInvoiceRepository implements InvoiceRepository {
       notes: m['notes'] as String?,
       paymentInstructions: m['payment_instructions'] as String?,
       currency: (m['currency'] as String?) ?? 'MYR',
+      storedTotal: items.isEmpty ? (m['total_amount'] as num?)?.toDouble() : null,
       createdAt: DateTime.tryParse(m['created_at'] as String? ?? ''),
       updatedAt: DateTime.tryParse(m['updated_at'] as String? ?? ''),
     );
