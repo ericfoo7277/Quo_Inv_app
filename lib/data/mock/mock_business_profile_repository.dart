@@ -54,4 +54,14 @@ class MockBusinessProfileRepository implements BusinessProfileRepository {
     // No-op in mock mode — logo upload requires Supabase Storage.
     return '';
   }
+
+  @override
+  Future<void> setSubscriptionTier(String tier) async {
+    await Future.delayed(_latency);
+    _profile = _profile.copyWith(
+      subscriptionTier: tier,
+      updatedAt: DateTime.now(),
+    );
+    _emit();
+  }
 }

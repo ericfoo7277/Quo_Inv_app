@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../../core/constants/app_spacing.dart';
+import '../../../core/exceptions/usage_limit_exception.dart';
+import '../../../core/router/route_names.dart';
 import '../../../core/widgets/app_card.dart';
 import '../../../core/widgets/app_text_field.dart';
 import '../../../core/widgets/primary_button.dart';
@@ -163,6 +166,8 @@ class _QuotationFormScreenState extends ConsumerState<QuotationFormScreen> {
       }
       ref.invalidate(quotationsProvider);
       if (mounted) Navigator.of(context).pop();
+    } on UsageLimitException {
+      if (mounted) _showUpgradeDialog('quotation');
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -172,6 +177,32 @@ class _QuotationFormScreenState extends ConsumerState<QuotationFormScreen> {
     } finally {
       if (mounted) setState(() => _loading = false);
     }
+  }
+
+  void _showUpgradeDialog(String docType) {
+    showDialog<void>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Monthly limit reached'),
+        content: Text(
+          'Free plan includes 10 ${docType}s per month. '
+          'Upgrade to Pro for unlimited ${docType}s.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: const Text('Maybe later'),
+          ),
+          FilledButton(
+            onPressed: () {
+              Navigator.of(ctx).pop();
+              context.goNamed(RouteNames.paywall);
+            },
+            child: const Text('Upgrade — RM 4.90/mo'),
+          ),
+        ],
+      ),
+    );
   }
 
   @override

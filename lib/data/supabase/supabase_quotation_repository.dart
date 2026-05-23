@@ -1,5 +1,6 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../../core/exceptions/usage_limit_exception.dart';
 import '../../shared/models/invoice.dart';
 import '../../shared/models/quotation.dart';
 import '../repositories/invoice_repository.dart';
@@ -92,11 +93,39 @@ class SupabaseQuotationRepository implements QuotationRepository {
   }
 
   // ---------------------------------------------------------------------------
+  // Usage limit (free tier: 10 quotations/month)
+  // ---------------------------------------------------------------------------
+
+  Future<void> _checkUsageLimit() async {
+    final profile = await _client
+        .from(_profiles)
+        .select('subscription_tier')
+        .eq('user_id', _uid)
+        .maybeSingle();
+    if ((profile?['subscription_tier'] as String?) == 'pro') return;
+
+    final now = DateTime.now();
+    final firstOfMonth =
+        DateTime.utc(now.year, now.month, 1).toIso8601String();
+    final rows = await _client
+        .from(_quotations)
+        .select('id')
+        .eq('user_id', _uid)
+        .gte('created_at', firstOfMonth) as List;
+    if (rows.length >= 10) {
+      throw const UsageLimitException(
+        'quotation',
+      );
+    }
+  }
+
+  // ---------------------------------------------------------------------------
   // Writes
   // ---------------------------------------------------------------------------
 
   @override
   Future<Quotation> create(Quotation quotation) async {
+    await _checkUsageLimit();
     final number = quotation.quotationNumber.isEmpty
         ? await _allocateNumber()
         : quotation.quotationNumber;

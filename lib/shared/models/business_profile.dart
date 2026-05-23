@@ -6,7 +6,7 @@ import 'pdf_template.dart';
 ///   address, logo_url, currency, payment_instructions,
 ///   default_quotation_notes, default_invoice_notes, quotation_prefix,
 ///   invoice_prefix, quotation_next_number, invoice_next_number,
-///   timezone, pdf_template, created_at, updated_at)
+///   timezone, pdf_template, subscription_tier, created_at, updated_at)
 class BusinessProfile {
   const BusinessProfile({
     required this.id,
@@ -26,6 +26,7 @@ class BusinessProfile {
     this.invoiceNextNumber = 1,
     this.timezone = 'Asia/Kuala_Lumpur',
     this.pdfTemplate = PdfTemplate.classic,
+    this.subscriptionTier = 'free',
     this.createdAt,
     this.updatedAt,
   });
@@ -73,6 +74,9 @@ class BusinessProfile {
   /// PDF layout template used when generating invoices and quotations.
   final PdfTemplate pdfTemplate;
 
+  /// Subscription tier: 'free' or 'pro'. Set server-side only.
+  final String subscriptionTier;
+
   final DateTime? createdAt;
   final DateTime? updatedAt;
 
@@ -94,6 +98,7 @@ class BusinessProfile {
     int? invoiceNextNumber,
     String? timezone,
     PdfTemplate? pdfTemplate,
+    String? subscriptionTier,
     DateTime? createdAt,
     DateTime? updatedAt,
   }) {
@@ -116,6 +121,7 @@ class BusinessProfile {
       invoiceNextNumber: invoiceNextNumber ?? this.invoiceNextNumber,
       timezone: timezone ?? this.timezone,
       pdfTemplate: pdfTemplate ?? this.pdfTemplate,
+      subscriptionTier: subscriptionTier ?? this.subscriptionTier,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
     );

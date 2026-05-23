@@ -35,6 +35,7 @@ class RouteNames {
   static const String numberingSettings = 'numbering-settings';
   static const String reminderSettings = 'reminder-settings';
   static const String defaultNotes = 'default-notes';
+  static const String paywall = 'paywall';
 }
 
 class RoutePaths {
@@ -73,4 +74,5 @@ class RoutePaths {
   static const String numberingSettings = '/settings/numbering';
   static const String reminderSettings = '/settings/reminders';
   static const String defaultNotes = '/settings/default-notes';
+  static const String paywall = '/paywall';
 }

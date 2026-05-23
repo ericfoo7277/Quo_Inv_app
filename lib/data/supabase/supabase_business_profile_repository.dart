@@ -74,6 +74,17 @@ class SupabaseBusinessProfileRepository implements BusinessProfileRepository {
     return _client.storage.from(_bucket).getPublicUrl(path);
   }
 
+  @override
+  Future<void> setSubscriptionTier(String tier) async {
+    await _client
+        .from(_table)
+        .update({
+          'subscription_tier': tier,
+          'updated_at': DateTime.now().toUtc().toIso8601String(),
+        })
+        .eq('user_id', _uid);
+  }
+
   Map<String, dynamic> _toMap(BusinessProfile p) => {
         'id': p.id,
         'user_id': _uid,
@@ -113,6 +124,7 @@ class SupabaseBusinessProfileRepository implements BusinessProfileRepository {
         invoiceNextNumber: m['invoice_next_number'] as int? ?? 1,
         timezone: m['timezone'] as String? ?? 'Asia/Kuala_Lumpur',
         pdfTemplate: PdfTemplate.fromString(m['pdf_template'] as String?),
+        subscriptionTier: m['subscription_tier'] as String? ?? 'free',
         createdAt: DateTime.tryParse(m['created_at'] as String? ?? ''),
         updatedAt: DateTime.tryParse(m['updated_at'] as String? ?? ''),
       );

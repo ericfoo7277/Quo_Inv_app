@@ -9,6 +9,7 @@ import '../../../core/widgets/app_card.dart';
 import '../../../core/widgets/premium_screen_header.dart';
 import '../../../core/widgets/settings_tile.dart';
 import '../../../shared/providers/auth_providers.dart';
+import '../../../shared/providers/business_profile_provider.dart';
 import '../../../shared/providers/theme_provider.dart';
 
 class SettingsScreen extends ConsumerWidget {
@@ -18,6 +19,10 @@ class SettingsScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final mode = ref.watch(themeModeProvider);
+    final isPro =
+        (ref.watch(businessProfileProvider).value?.subscriptionTier ??
+                'free') ==
+            'pro';
 
     return Scaffold(
       appBar: AppBar(title: const Text('Settings')),
@@ -30,6 +35,19 @@ class SettingsScreen extends ConsumerWidget {
             icon: Icons.settings_rounded,
           ),
           const SizedBox(height: AppSpacing.xxl),
+          AppCard(
+            padding: EdgeInsets.zero,
+            child: SettingsTile(
+              icon: Icons.workspace_premium_rounded,
+              iconColor: AppColors.primary,
+              title: isPro ? 'QuoSwift Pro' : 'Upgrade to Pro',
+              subtitle: isPro
+                  ? 'Unlimited invoices, no watermark'
+                  : 'Unlock unlimited docs · RM 4.90/mo',
+              onTap: () => context.goNamed(RouteNames.paywall),
+            ),
+          ),
+          const SizedBox(height: AppSpacing.lg),
           AppCard(
             padding: EdgeInsets.zero,
             child: Column(

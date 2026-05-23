@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'app.dart';
+import 'core/billing/revenuecat_service.dart';
 import 'core/config/app_config.dart';
 import 'core/notifications/firebase_messaging_service.dart';
 import 'core/notifications/local_notification_service.dart';
@@ -51,6 +52,24 @@ Future<void> main() async {
       url: appConfig.supabaseUrl,
       anonKey: appConfig.supabaseAnonKey,
     );
+  }
+
+  // RevenueCat — safe no-op if API keys are not supplied via --dart-define.
+  await RevenueCatService.instance.init(
+    userId: appConfig.isSupabaseConfigured
+        ? Supabase.instance.client.auth.currentUser?.id
+        : null,
+  );
+  // Keep RevenueCat identity in sync with Supabase auth state.
+  if (appConfig.isSupabaseConfigured) {
+    Supabase.instance.client.auth.onAuthStateChange.listen((event) {
+      final uid = event.session?.user.id;
+      if (uid != null && uid.isNotEmpty) {
+        RevenueCatService.instance.identify(uid);
+      } else {
+        RevenueCatService.instance.reset();
+      }
+    });
   }
 
   // Firebase – uses google-services.json (Android) and GoogleService-Info

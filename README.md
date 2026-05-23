@@ -9,3 +9,9 @@ flutter build apk --dart-define=SUPABASE_URL=https://qtmufapdhghwkugseilg.supaba
 
 NEW
 flutter run --dart-define=SUPABASE_URL=https://kmrdomqujnbcewbrbicq.supabase.co --dart-define=SUPABASE_ANON_KEY=sb_publishable_iZcY5DJX1LIyqcW-9F3-YQ_MpOf-D8T
+
+flutter run \
+  --dart-define=SUPABASE_URL=... \
+  --dart-define=SUPABASE_ANON_KEY=... \
+  --dart-define=RC_IOS_KEY=appl_xxxxxxxxxxxxxx \
+  --dart-define=RC_ANDROID_KEY=goog_xxxxxxxxxxxxxx

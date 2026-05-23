@@ -22,4 +22,12 @@ abstract class BusinessProfileRepository {
   ///
   /// In mock mode this is a no-op that returns an empty string.
   Future<String> uploadLogo(Uint8List imageBytes);
+
+  /// Persists the subscription tier for the current user. Pass `'pro'` after
+  /// a successful RevenueCat purchase / restore, or `'free'` on cancellation.
+  ///
+  /// NOTE: This is an MVP-grade approach that trusts the client. Harden it
+  /// later by moving the write to a Supabase Edge Function that validates the
+  /// RevenueCat receipt or by wiring a RevenueCat webhook.
+  Future<void> setSubscriptionTier(String tier);
 }
