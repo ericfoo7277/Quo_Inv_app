@@ -15,3 +15,19 @@ flutter run \
   --dart-define=SUPABASE_ANON_KEY=... \
   --dart-define=RC_IOS_KEY=appl_xxxxxxxxxxxxxx \
   --dart-define=RC_ANDROID_KEY=goog_xxxxxxxxxxxxxx
+
+
+  App Bundle Production
+  flutter build appbundle \
+  --dart-define=SUPABASE_URL=https://qtmufapdhghwkugseilg.supabase.co \
+  --dart-define=SUPABASE_ANON_KEY=your_anon_key \
+  --dart-define=RC_ANDROID_KEY=goog_xxxxxxxxxxxxxx
+
+  APK (for direct install / testing):
+  flutter build apk \
+  --dart-define=SUPABASE_URL=https://qtmufapdhghwkugseilg.supabase.co \
+  --dart-define=SUPABASE_ANON_KEY=your_anon_key \
+  --dart-define=RC_ANDROID_KEY=goog_xxxxxxxxxxxxxx
+
+  Verify the signing is correct
+  keytool -printcert -jarfile build/app/outputs/flutter-apk/app-release.apk
