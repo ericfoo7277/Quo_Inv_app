@@ -44,7 +44,7 @@ class SettingsScreen extends ConsumerWidget {
               subtitle: isPro
                   ? 'Unlimited invoices, no watermark'
                   : 'Unlock unlimited docs · RM 4.90/mo',
-              onTap: () => context.goNamed(RouteNames.paywall),
+              onTap: () => context.pushNamed(RouteNames.paywall),
             ),
           ),
           const SizedBox(height: AppSpacing.lg),

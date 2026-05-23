@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show PlatformException;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -52,7 +53,7 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
       await _markPro();
       if (!mounted) return;
       _showSnack('Welcome to Pro! 🎉');
-      Navigator.of(context).maybePop();
+      context.pop();
     } on PlatformException catch (e) {
       // RevenueCat throws PlatformException for user-cancel as well.
       final code = PurchasesErrorHelper.getErrorCode(e);
@@ -75,7 +76,7 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
         await _markPro();
         if (!mounted) return;
         _showSnack('Subscription restored.');
-        Navigator.of(context).maybePop();
+        context.pop();
       } else {
         _showSnack('No active subscription found.');
       }
@@ -106,7 +107,7 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
         title: const Text('QuoSwift Pro'),
         leading: IconButton(
           icon: const Icon(Icons.close),
-          onPressed: () => Navigator.of(context).maybePop(),
+          onPressed: () => context.pop(),
         ),
       ),
       body: SafeArea(

@@ -196,7 +196,7 @@ class _QuotationFormScreenState extends ConsumerState<QuotationFormScreen> {
           FilledButton(
             onPressed: () {
               Navigator.of(ctx).pop();
-              context.goNamed(RouteNames.paywall);
+              context.pushNamed(RouteNames.paywall);
             },
             child: const Text('Upgrade — RM 4.90/mo'),
           ),
